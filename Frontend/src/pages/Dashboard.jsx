@@ -4,6 +4,7 @@ import {
   fetchListedIPOs,
   fetchCompanyGrowthData,
 } from '../features/company/companyService';
+import TradingForm from '../components/TradingForm';
 import './Dashboard.css';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────
@@ -78,7 +79,7 @@ function SteppedChart({ data = [], isUp = true }) {
 
 const ITEMS_PER_PAGE = 4;
 
-export default function Dashboard({ onBackToHome }) {
+export default function Dashboard({ onBackToHome, onOpenTradePage }) {
   const [query, setQuery] = useState('');
   const [marketFilter, setMarketFilter] = useState('US / Global');
   const [ipoList, setIpoList] = useState([]);
@@ -123,6 +124,19 @@ export default function Dashboard({ onBackToHome }) {
     setSelectedCompany(null);
     setQuery('');
     setCurrentPage(1);
+  }
+
+  function handleTradeClick(item) {
+    if (onOpenTradePage) {
+      onOpenTradePage({
+        name: item.name || item.companyName || 'Company Inc',
+        symbol: item.symbol || 'TICKER',
+        price: item.price || item.defaultPrice || item.rawPrice || 100,
+        change: item.change || '+1.20%',
+        isUp: item.isUp !== false,
+        currency: item.currency || '$',
+      });
+    }
   }
 
   // Pagination calculation for default directory
@@ -298,9 +312,18 @@ export default function Dashboard({ onBackToHome }) {
         </div>
 
         {selectedCompany && (
-          <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
-            ← View All Listed IPOs
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              className="nb-view-all-btn"
+              style={{ background: '#2EC4B6', color: '#18181B' }}
+              onClick={() => handleTradeClick(selectedCompany)}
+            >
+              Open Trade Console ({selectedCompany.symbol}) ⚡
+            </button>
+            <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
+              ← View All Listed IPOs
+            </button>
+          </div>
         )}
       </div>
 
@@ -328,6 +351,13 @@ export default function Dashboard({ onBackToHome }) {
               {selectedCompany ? 'Intel Categories' : 'Listing Categories'}
             </label>
             <div className="nb-nav-menu">
+              <div
+                className={`nb-nav-tab ${activeTab === 'trade' ? 'active' : ''}`}
+                onClick={() => setActiveTab('trade')}
+              >
+                <span>{selectedCompany ? '⚡ Trading Console' : 'Trade Console'}</span>
+                <span>↗</span>
+              </div>
               <div
                 className={`nb-nav-tab ${activeTab === 'fundamentals' ? 'active' : ''}`}
                 onClick={() => setActiveTab('fundamentals')}
@@ -430,7 +460,14 @@ export default function Dashboard({ onBackToHome }) {
                     </div>
                   </div>
 
-                  <div className="nb-ipo-right-action">
+                    <div className="nb-ipo-right-action" style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        className="nb-action-btn"
+                        style={{ background: '#2EC4B6', color: '#18181B' }}
+                        onClick={() => handleTradeClick(item)}
+                      >
+                        Trade ⚡
+                      </button>
                     <button
                       className="nb-action-btn"
                       onClick={() => handleSelectCompany(item.symbol)}
@@ -589,7 +626,35 @@ export default function Dashboard({ onBackToHome }) {
                 </div>
               </div>
 
-              {/* Dynamic Section (Fundamentals / Risk / News / History) */}
+              {/* REAL-TIME TRADING CONSOLE LAUNCHER CARD */}
+              <div className="nb-company-card" style={{ background: '#0F172A', color: '#F8FAFC', border: '2px solid #1E293B', marginBottom: '24px' }}>
+                <div className="nb-cc-header">
+                  <div className="nb-cc-left">
+                    <div className="nb-cc-logo-box" style={{ background: '#6366F1' }}>⚡</div>
+                    <div className="nb-cc-title-wrap">
+                      <div className="nb-cc-title-row">
+                        <span className="nb-cc-title" style={{ color: '#FFFFFF' }}>Real-time Trading Console</span>
+                        <span className="nb-tag-pill green">Live Simulation Engine</span>
+                      </div>
+                      <span className="nb-cc-sub" style={{ color: '#94A3B8' }}>
+                        Dedicated Order Execution & Order Time History Log for {selectedCompany.name} ({selectedCompany.symbol})
+                      </span>
+                    </div>
+                  </div>
+                  <div className="nb-cc-right">
+                    <button
+                      className="nb-action-btn"
+                      style={{ background: '#2EC4B6', color: '#18181B', fontWeight: 800, padding: '10px 20px' }}
+                      onClick={() => handleTradeClick(selectedCompany)}
+                    >
+                      Launch Trade Console ⚡
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Intel Tabs (Fundamentals / Risk / News / History) */}
+
               {activeTab === 'fundamentals' && (
                 <div className="nb-company-card">
                   <div className="nb-cc-header">
