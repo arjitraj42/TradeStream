@@ -1,14 +1,19 @@
 {
-  "name": "trading-root",
+  "name": "tradestream",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev": "npm --prefix Frontend run dev",
-    "build": "npm --prefix Frontend run build && (cd backend && npx prisma generate --schema=prisma/schema.prisma)",
+    "build": "npm --prefix Frontend install && npm --prefix Frontend run build",
     "build:frontend": "npm --prefix Frontend run build",
-    "build:backend": "cd backend && npx prisma generate --schema=prisma/schema.prisma",
-    "generate": "cd backend && npx prisma generate --schema=prisma/schema.prisma",
-    "prisma:generate": "cd backend && npx prisma generate --schema=prisma/schema.prisma",
+    "build:backend": "cd backend && npm install",
     "preview": "npm --prefix Frontend run preview"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
   }
 }

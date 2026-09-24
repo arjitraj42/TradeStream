@@ -174,11 +174,18 @@ npx prisma db push --schema=prisma/schema.prisma
 ```
 
 ### 4. Run Local Development Server
-Start the Vite dev server from the root or Frontend directory:
+Start the Vite dev server from the root directory:
 ```bash
 npm run dev
 ```
 Open **`http://localhost:5173`** (or `http://localhost:5174`) in your browser.
+
+### 5. 🌐 1-Click Vercel Deployment (Full-Stack Frontend + Serverless API)
+This project is configured to run 100% on **Vercel** with zero external servers needed:
+1. **Import the repository** into Vercel.
+2. Vercel automatically detects `vercel.json` and runs `npm run build`.
+3. The React/Vite UI is served from `Frontend/dist`, and all `/api/*` endpoints are handled natively via Vercel Serverless Functions (`api/index.js`).
+4. **No external URLs or Render setup required!**
 
 ---
 

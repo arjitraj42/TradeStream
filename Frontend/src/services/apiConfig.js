@@ -1,7 +1,7 @@
 /**
  * Centralized API Config for TradeStream Frontend
- * Automatically connects to VITE_API_BASE_URL (Vercel Env Var)
- * or defaults seamlessly to https://tradestream-w1ys.onrender.com
+ * - On Vercel: uses relative '/api' (same origin serverless functions)
+ * - If VITE_API_BASE_URL is set: uses custom backend URL
  */
 
 export const getApiBaseUrl = () => {
@@ -9,7 +9,7 @@ export const getApiBaseUrl = () => {
   if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
     return envUrl.trim().replace(/\/$/, '');
   }
-  return 'https://tradestream-w1ys.onrender.com';
+  return '';
 };
 
-export const API_BASE_URL = `${getApiBaseUrl()}/api`;
+export const API_BASE_URL = getApiBaseUrl() ? `${getApiBaseUrl()}/api` : '/api';

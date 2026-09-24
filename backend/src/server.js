@@ -1026,6 +1026,26 @@ app.get('/api/context', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 TradeStream Backend running on http://localhost:${PORT}`);
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'TradeStream Serverless API is running on Vercel',
+    timestamp: new Date().toISOString(),
+  });
 });
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`🚀 TradeStream Backend running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
+
