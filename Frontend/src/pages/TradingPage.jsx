@@ -245,7 +245,7 @@ export default function TradingPage({ company, onBack }) {
           <div className="tp-order-card">
             <div className="tp-card-title">
               <span>Execution Console</span>
-              <span style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600 }}>
+              <span style={{ fontSize: 12, color: '#71717A', fontWeight: 800 }}>
                 {targetCompany.symbol}
               </span>
             </div>
@@ -410,7 +410,7 @@ export default function TradingPage({ company, onBack }) {
                               {item.side}
                             </span>
                           </td>
-                          <td style={{ textAlign: 'right', color: '#94A3B8' }}>
+                          <td style={{ textAlign: 'right', color: '#52525B', fontWeight: 800 }}>
                             {item.orderType}
                           </td>
                         </tr>
