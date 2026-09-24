@@ -7,6 +7,7 @@
     "build": "npm --prefix Frontend run build && (cd backend && npx prisma generate --schema=prisma/schema.prisma)",
     "build:frontend": "npm --prefix Frontend run build",
     "build:backend": "cd backend && npx prisma generate --schema=prisma/schema.prisma",
+    "generate": "cd backend && npx prisma generate --schema=prisma/schema.prisma",
     "prisma:generate": "cd backend && npx prisma generate --schema=prisma/schema.prisma",
     "preview": "npm --prefix Frontend run preview"
   }
