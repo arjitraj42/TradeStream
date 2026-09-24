@@ -511,14 +511,10 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
   const [loading, setLoading] = useState(false);
   const [showSug, setShowSug] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-<<<<<<< HEAD
-  
   // Specific Granular Filters
   const [marketTypeFilter, setMarketTypeFilter] = useState('all'); // 'all', 'mini', 'unicorns', 'ipos', 'mega', 'global'
   const [sectorFilter, setSectorFilter] = useState('all'); // 'all', 'ai', 'commerce', 'fintech', 'edtech', 'deeptech'
   const [stageFilter, setStageFilter] = useState('all'); // 'all', 'seed', 'seriesA', 'unicorn', 'listed'
-  
-=======
   const [viewMode, setViewMode] = useState('directory'); // 'directory', 'intel', 'market-pulse', 'api-docs'
   
   // Trade Modal State
@@ -530,8 +526,6 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
   const [tradePrice, setTradePrice] = useState(128.45);
   const [tradeSubmitting, setTradeSubmitting] = useState(false);
   const [tradeSuccessMsg, setTradeSuccessMsg] = useState(null);
-
->>>>>>> origin/main
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -771,14 +765,12 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
           >
             Company Intel
           </span>
-<<<<<<< HEAD
           <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('mini'); }}>
             Mini Startups ({miniCount})
           </span>
           <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('unicorns'); }}>
             Unicorns ({unicornCount})
           </span>
-=======
           <span
             className="nb-nav-link"
             style={{ color: '#10B981', fontStyle: 'normal' }}
@@ -786,9 +778,6 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
           >
             ⚡ Engine Simulator
           </span>
-          <span className="nb-nav-link">Market Screener</span>
-          <span className="nb-nav-link">API Docs</span>
->>>>>>> origin/main
         </nav>
 
         <div className="nb-nav-right">
@@ -960,35 +949,34 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
           </span>
         </div>
 
-<<<<<<< HEAD
         {selectedCompany ? (
-          <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
-            ← View All Startups & IPOs
-          </button>
-        ) : (
-          (marketTypeFilter !== 'all' || sectorFilter !== 'all' || stageFilter !== 'all' || query || marketRegionSearch) && (
-            <button className="nb-view-all-btn" onClick={handleClearAllFilters}>
-              Reset Filters ✕
-=======
-        {!selectedCompany ? (
-          <button
-            className="nb-view-all-btn"
-            style={{ background: '#10B981', color: '#FFFFFF' }}
-            onClick={onOpenEngineSimulator}
-          >
-            ⚡ Open Matching Engine Simulator
-          </button>
-        ) : (
           <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
+              ← View All Startups & IPOs
+            </button>
             <button
               className="nb-view-all-btn"
               style={{ background: '#2EC4B6', color: '#18181B' }}
               onClick={() => handleTradeClick(selectedCompany)}
             >
               Open Trade Console ({selectedCompany.symbol}) ⚡
->>>>>>> origin/main
             </button>
-          )
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            {(marketTypeFilter !== 'all' || sectorFilter !== 'all' || stageFilter !== 'all' || query || marketRegionSearch) && (
+              <button className="nb-view-all-btn" onClick={handleClearAllFilters}>
+                Reset Filters ✕
+              </button>
+            )}
+            <button
+              className="nb-view-all-btn"
+              style={{ background: '#10B981', color: '#FFFFFF' }}
+              onClick={onOpenEngineSimulator}
+            >
+              ⚡ Open Matching Engine Simulator
+            </button>
+          </div>
         )}
       </div>
 
