@@ -1,0 +1,79 @@
+// Prisma Schema for Trader Simulation Engine
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum NewsSentiment {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum OrderSide {
+  BUY
+  SELL
+}
+
+enum OrderType {
+  LIMIT
+  MARKET
+}
+
+model NewsEvent {
+  id          String        @id @default(uuid())
+  headline    String
+  sentiment   NewsSentiment @default(NEUTRAL)
+  impactScore Int           @default(5)
+  createdAt   DateTime      @default(now())
+
+  @@map("news_events")
+}
+
+model GeneratedOrder {
+  id         String    @id @default(uuid())
+  traderType String
+  side       OrderSide
+  orderType  OrderType
+  price      Float
+  quantity   Int
+  confidence Float     @default(1.0)
+  reason     String?
+  forwarded  Boolean   @default(false)
+  timestamp  DateTime  @default(now())
+
+  @@map("generated_orders")
+}
+
+model TraderConfiguration {
+  id              String   @id @default(uuid())
+  traderType      String   @unique
+  displayName     String
+  enabled         Boolean  @default(true)
+  confidenceScore Float    @default(0.8)
+  riskAppetite    Float    @default(0.5)
+  minQuantity     Int      @default(10)
+  maxQuantity     Int      @default(500)
+  customSettings  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("trader_configurations")
+}
+
+model MarketStateHistory {
+  id            String   @id @default(uuid())
+  currentPrice  Float
+  previousPrice Float
+  fairValue     Float
+  volatility    Float
+  latestNewsId  String?
+  timestamp     DateTime @default(now())
+
+  @@map("market_state_history")
+}

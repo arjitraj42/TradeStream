@@ -4,6 +4,7 @@ import {
   fetchListedIPOs,
   fetchCompanyGrowthData,
 } from '../features/company/companyService';
+import TradingForm from '../components/TradingForm';
 import './Dashboard.css';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────
@@ -401,7 +402,7 @@ function InteractivePrecisionChart({ basePrice = 200, isUp = true, symbol = 'MEE
 
 const ITEMS_PER_PAGE = 4;
 
-export default function Dashboard({ onBackToHome }) {
+export default function Dashboard({ onBackToHome, onOpenTradePage }) {
   const [query, setQuery] = useState('');
   const [marketRegionSearch, setMarketRegionSearch] = useState('');
   const [allCompaniesList, setAllCompaniesList] = useState(POPULAR_COMPANIES);
@@ -543,6 +544,20 @@ export default function Dashboard({ onBackToHome }) {
     setCurrentPage(1);
   }
 
+  function handleTradeClick(item) {
+    if (onOpenTradePage) {
+      onOpenTradePage({
+        name: item.name || item.companyName || 'Company Inc',
+        symbol: item.symbol || 'TICKER',
+        price: item.price || item.defaultPrice || item.rawPrice || 100,
+        change: item.change || '+1.20%',
+        isUp: item.isUp !== false,
+        currency: item.currency || '$',
+      });
+    }
+  }
+
+  // Pagination calculation for filtered directory
   const totalPages = Math.ceil(filteredList.length / ITEMS_PER_PAGE) || 1;
   const displayedIpos = filteredList.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -1011,7 +1026,14 @@ export default function Dashboard({ onBackToHome }) {
                       </div>
                     </div>
 
-                    <div className="nb-ipo-right-action">
+                    <div className="nb-ipo-right-action" style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        className="nb-action-btn"
+                        style={{ background: '#2EC4B6', color: '#18181B' }}
+                        onClick={() => handleTradeClick(item)}
+                      >
+                        Trade ⚡
+                      </button>
                       <button
                         className="nb-action-btn"
                         onClick={() => handleSelectCompany(item.symbol)}
