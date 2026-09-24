@@ -79,7 +79,7 @@ function SteppedChart({ data = [], isUp = true }) {
 
 const ITEMS_PER_PAGE = 4;
 
-export default function Dashboard({ onBackToHome, onOpenTradePage }) {
+export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineSimulator }) {
   const [query, setQuery] = useState('');
   const [marketFilter, setMarketFilter] = useState('US / Global');
   const [ipoList, setIpoList] = useState([]);
@@ -186,6 +186,13 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
             }}
           >
             Company Intel
+          </span>
+          <span
+            className="nb-nav-link"
+            style={{ color: '#10B981', fontStyle: 'normal' }}
+            onClick={onOpenEngineSimulator}
+          >
+            ⚡ Engine Simulator
           </span>
           <span className="nb-nav-link">Market Screener</span>
           <span className="nb-nav-link">API Docs</span>
@@ -311,7 +318,15 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
           </span>
         </div>
 
-        {selectedCompany && (
+        {!selectedCompany ? (
+          <button
+            className="nb-view-all-btn"
+            style={{ background: '#10B981', color: '#FFFFFF' }}
+            onClick={onOpenEngineSimulator}
+          >
+            ⚡ Open Matching Engine Simulator
+          </button>
+        ) : (
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
               className="nb-view-all-btn"
