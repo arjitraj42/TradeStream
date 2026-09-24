@@ -1,63 +1,80 @@
-# ⚡ Trader Simulation Engine & Trading Platform
+# ⚡ TradeStream Platform & Matching Engine Simulator
 
-A production-ready, autonomous **Stock Market Simulation & Trading Platform** built with **Node.js, Express, PostgreSQL, Prisma ORM, Socket.IO, React, Vite, and Tailwind CSS**.
-
-This platform continuously simulates realistic stock market participants that dynamically evaluate market context, news events, price movements, and trader risk profiles to generate **BUY** and **SELL** orders every **7 seconds**. These orders are stored in PostgreSQL via Prisma ORM, broadcasted in real-time via **Socket.IO**, and prepared for external forwarding to a separate **Order Matching Engine**.
+A production-ready, high-performance **Stock Market Intelligence, Trading Platform & Order Matching Engine Simulator** built with **React, Vite, Node.js, Express, PostgreSQL, Prisma ORM, Socket.IO, and Neo-Brutalist UI Styling**.
 
 ---
 
 ## 🌟 Key Features & Highlights
 
-- **Clean Architecture & Separated Codebase**:
-  - `backend/`: Node.js, Express, Socket.IO, Prisma ORM, node-cron.
-  - `frontend/`: React, Vite, Tailwind CSS, Axios, Lucide Icons.
-- **5 Autonomous Trader Strategies**:
-  1. 📈 **MomentumTrader**: Capitalizes on trend momentum (> 2% price moves).
-  2. 💎 **ValueTrader**: Executes mean-reversion trades based on fundamental `fairValue`.
-  3. 🐻 **BearTrader**: Reacts fearfully to negative news, selling aggressively while buying conservatively on positive news.
-  4. ⚡ **AggressiveTrader**: Sweeps market liquidity with large MARKET orders on high-impact news ($\ge 7/10$).
-  5. ⚖️ **MarketMakerTrader**: Provides continuous bid/ask limit liquidity around market price.
-- **7-Second Paced Simulation Loop**: Runs every 7 seconds (`*/7 * * * * *`) for realistic human-readable order streams.
-- **Real-Time Web Dashboard**: Built-in glassmorphic UI displaying live market metrics, dynamic price action, active news impact, trader fleet status, manual Buy/Sell console, and real-time Socket.IO order drawer.
-- **Order Time History Log**: Detailed chronological log tracking formatted timestamps (`hh:mm:ss AM/PM`) for all trades.
-- **Bonus Engine Capabilities**:
-  - **Volatility-based Position Sizing**: Traders scale order sizes according to dynamic volatility and risk appetite.
-  - **Exponential News Impact Decay**: News sentiment impact naturally decays over time based on half-life calculations.
-  - **Stochastic Price Movement & Mean Reversion**: Realistic random walk with fair value pull.
-- **Future Integration Ready**: Non-blocking adapter layer for forwarding generated orders to external Matching Engines via `POST /api/matching-engine/orders`.
-- **Fault-Tolerant & Resilient**: Automatic fallback to in-memory caching if PostgreSQL connection is offline or starting up.
+### 1. ⚙️ In-Memory Price-Time Priority Matching Engine (`MatchingEngine.js`)
+- **Price-Time Priority (FIFO) Algorithm**:
+  - `BIDs` sorted highest price first (descending).
+  - `ASKs` sorted lowest price first (ascending).
+  - Orders at the same price level are executed in strict First-In-First-Out (FIFO) queue order.
+- **Order Types**: Full support for `LIMIT` and `MARKET` orders across `BUY` and `SELL` sides.
+- **Partial Fills**: Fills partial liquidity and places remaining limit quantity into the order book queue.
+- **Microsecond Latency Tracking**: Real-time performance tracking measuring matching execution latency in milliseconds/microseconds (`performance.now()`).
+
+### 2. 📊 Matching Engine Simulator Dashboard (`EngineSimulatorPage.jsx`)
+- **Engine Metrics KPI Dashboard**: Live tracking of *Orders Processed*, *Trades Executed*, *Orders / Sec (Throughput)*, *Average Latency (ms)*, *Best Bid/Ask & Spread*, and *Open Depth*.
+- **Live Order Book & Depth Visualizer**:
+  - Top 10 Bids (Green depth bars) & Asks (Red depth bars).
+  - Live Mid Price & Spread banner.
+  - Click-to-Price auto-filling into Order Entry.
+- **Order Flow Visual Pipeline**: 3-stage animated order flow: `1. Order Entry Queue ➜ 2. Matching Engine ➜ 3. Trade Execution / Book`.
+- **Open Orders Management**: Filterable active limit orders table with one-click **Cancel** order capabilities.
+- **Live Executed Trade Feed**: Chronological trade execution ledger with taker side indicators and trade IDs.
+- **🤖 AI Trader Simulation Agents**:
+  - 🐂 **Bull Agent**: Generates aggressive BUY orders pushing prices up.
+  - 🐻 **Bear Agent**: Generates aggressive SELL orders pushing prices down.
+  - ⚖️ **Market Maker Agent**: Places paired BID/ASK limit orders providing continuous liquidity.
+  - ⚡ **Continuous Simulation**: Automatic background order loop running by default on page load.
 
 ---
 
-## 📁 Project Structure
+### 3. ⚡ Dedicated Per-Company Trading Console (`TradingPage.jsx`)
+- **Universal Ticker Support**: Dedicated trading interfaces for any public company (e.g., `MSFT`, `TSLA`, `AAPL`, `NVDA`, `RELIANCE`).
+- **Multi-Currency Toggle**: Instant switcher between **₹ (INR)** and **$ (USD)** with dynamic total estimation.
+- **Order Time History Log**: Chronological order execution log tracking user and autonomous trader orders (`ValueTrader`, `MarketMakerTrader`, `MomentumTrader`, `BearTrader`, `AggressiveTrader`).
+
+---
+
+### 4. 📈 Market Intelligence & IPO Directory (`Dashboard.jsx`)
+- **Public IPO Catalog**: Browse, filter, and search active public listings and IPOs.
+- **Finnhub & Tavily AI Integration**: Live market quotes powered by Finnhub and AI company intelligence summaries powered by Tavily Search.
+- **Visual Analytics**: Interactive step trajectory charts and weekly volume activity bars.
+
+---
+
+## 📁 Repository Structure
 
 ```
 TradeValue/
-├── backend/                  # Node.js Express & Socket.IO Engine
+├── Frontend/                 # React + Vite Frontend
 │   ├── src/
-│   │   ├── config/           # env, constants, prisma setup
-│   │   ├── controllers/      # market, news, order, trader, simulation
-│   │   ├── models/           # zod validation schemas
-│   │   ├── repositories/     # news, order, trader config repos
-│   │   ├── routes/           # express API routes
-│   │   ├── scheduler/        # 7-second node-cron tick manager
-│   │   ├── services/         # market context, news, order execution
-│   │   ├── sockets/          # Socket.IO event manager
-│   │   ├── traders/          # 5 autonomous trader implementations
-│   │   └── utils/            # math, logger, error handler
-│   ├── prisma/               # schema.prisma & seed.js
-│   ├── public/               # fallback static assets
-│   ├── .env
-│   └── package.json
-│
-├── frontend/                 # React + Vite + Tailwind CSS Console
-│   ├── src/
-│   │   ├── components/       # TradingForm, SimulationDrawer, OrderHistoryTable
-│   │   ├── pages/            # TradingPage
-│   │   ├── services/         # orderService (Axios)
-│   │   ├── App.jsx
+│   │   ├── engine/           # In-Memory Price-Time Priority Matching Engine
+│   │   │   └── MatchingEngine.js
+│   │   ├── pages/            # Page Views
+│   │   │   ├── Dashboard.jsx / Dashboard.css         # Main Intelligence Directory
+│   │   │   ├── EngineSimulatorPage.jsx / .css        # Matching Engine Simulator
+│   │   │   ├── TradingPage.jsx / TradingPage.css     # Dedicated Per-Company Console
+│   │   │   ├── Home.jsx / Welcome.jsx                # Landing & Onboarding
+│   │   ├── components/       # UI Components & Market Pulse
+│   │   ├── services/         # orderService & Finnhub/Tavily API adapters
+│   │   ├── App.jsx           # Top-level Routing
 │   │   └── main.jsx
 │   ├── vite.config.js
+│   └── package.json
+│
+├── backend/                  # Node.js Express & Socket.IO Engine
+│   ├── src/
+│   │   ├── controllers/      # market, news, order, trader controllers
+│   │   ├── routes/           # REST API routes
+│   │   ├── scheduler/        # node-cron simulation scheduler
+│   │   ├── services/         # market context & finnhub/tavily adapters
+│   │   ├── traders/          # 5 autonomous trader strategy classes
+│   │   └── server.js
+│   ├── prisma/               # schema.prisma & seed.js
 │   └── package.json
 │
 ├── package.json              # Root orchestration scripts
@@ -71,92 +88,39 @@ TradeValue/
 ### 1. Installation
 Clone the repository and install dependencies:
 ```bash
-# Install backend dependencies
-cd backend && npm install
+# Install root dependencies
+npm install
 
-# Install frontend dependencies
-cd ../frontend && npm install
+# Install Frontend dependencies
+cd Frontend && npm install
+
+# Install Backend dependencies
+cd ../backend && npm install
 ```
 
-### 2. Environment Configuration (`backend/.env`)
-```env
-PORT=3000
-NODE_ENV=development
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/trader_simulation?schema=public"
-MATCHING_ENGINE_URL="http://localhost:4000/api/matching-engine/orders"
-SIMULATION_CRON_SCHEDULE="*/7 * * * * *"
-INITIAL_PRICE=100.00
-INITIAL_FAIR_VALUE=100.00
-INITIAL_VOLATILITY=0.03
-AUTO_SIMULATE_PRICE_MOVEMENT=true
-```
-
-### 3. Database Setup (PostgreSQL + Prisma)
-Generate Prisma Client and push schema to PostgreSQL:
+### 2. Run Local Development Server
+Start the Vite dev server from the root or Frontend directory:
 ```bash
-npm run prisma:generate
-npm run prisma:push
-npm run seed
+npm run dev
 ```
-
-### 4. Running the Application
-
-From the root directory:
-
-#### Run Backend Server:
-```bash
-npm run dev:backend
-```
-
-#### Run Frontend Dev Server (Vite HMR):
-```bash
-npm run dev:frontend
-```
-
-#### Build Production Bundle:
-```bash
-npm run build:frontend
-```
-
-Once running, access:
-- **Interactive Web Dashboard**: [http://localhost:3000](http://localhost:3000)
-- **API Health Check**: [http://localhost:3000/api/health](http://localhost:3000/api/health)
+Open **`http://localhost:5173`** (or `http://localhost:5174`) in your browser.
 
 ---
 
-## 📡 REST API Reference
+## 🧪 How to Verify Matching Engine Features
 
-### 1. Market Context API
-`GET /api/context` – Returns current market context (price, fair value, volatility, decayed news).
-
-### 2. News/Event Engine API
-`POST /api/news` – Broadcasts a new market event (`headline`, `sentiment`, `impactScore`).
-`GET /api/news` – Fetches recent news events.
-
-### 3. Orders API
-`POST /api/orders` – Submit manual Buy/Sell orders (`side`, `orderType`, `price`, `quantity`).
-`GET /api/orders` – Retrieves generated orders history with filtering and pagination.
-
-### 4. Traders Configuration API
-`GET /api/traders` – Lists registered autonomous traders and their configurations.
-`PUT /api/traders/:traderType` – Update trader settings.
-
-### 5. Simulation Scheduler API
-`POST /api/simulation/run` – Execute 1 tick manually.
-`POST /api/simulation/start` / `stop` – Pause or resume 7s scheduled loop.
-
----
-
-## ⚡ Real-Time Socket.IO Events
-
-| Event Name | Description |
-| :--- | :--- |
-| `new-order` | Emitted whenever an order (user or bot) is generated. |
-| `market-update` | Emitted every 7s tick with updated price, fair value & volatility. |
-| `news-event` | Emitted immediately when news is published. |
-| `simulation-status` | Emitted when simulation is paused or resumed. |
+1. Open **`http://localhost:5174/`** in your browser.
+2. Click **`⚡ Engine Simulator`** on the top navigation bar.
+3. **Test Order Matching**:
+   - Submit a BUY Limit order @ `$180.50` x `10` shares.
+   - Observe immediate execution against Ask liquidity in the **Live Executed Trade Feed**.
+4. **Test AI Agents**:
+   - Click **`🐂 Bull Agent`**, **`🐻 Bear Agent`**, or **`⚖️ Market Maker`**.
+   - Watch orders flow through the 3-step pipeline and populate the order book.
+5. **Test Order Cancellation**:
+   - Click **`Cancel`** next to any active order in the **Open Orders Management** panel to see instant book removal.
 
 ---
 
 ## 📜 License
-ISC License. Built for Stock Intelligence & Market Simulation Platforms.
+ISC License. Built for High-Performance Trading Systems & Market Engine Simulations.
