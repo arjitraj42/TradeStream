@@ -33,7 +33,7 @@ body, html {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── NEO-BRUTALIST SHELL ────────────────────────────────────────── */
+/* ── SHELL & TOP NAVBAR ──────────────────────────────────────────── */
 .nb-shell {
   min-height: 100vh;
   background-color: var(--nb-bg);
@@ -41,7 +41,6 @@ body, html {
   flex-direction: column;
 }
 
-/* ── TOP HEADER / NAVBAR ────────────────────────────────────────── */
 .nb-navbar {
   height: 68px;
   background-color: var(--nb-bg);
@@ -178,7 +177,6 @@ body, html {
   margin-bottom: 24px;
 }
 
-/* Search bar cluster */
 .nb-search-row {
   display: flex;
   align-items: center;
@@ -262,7 +260,6 @@ body, html {
   box-shadow: 0 0 0 transparent;
 }
 
-/* Suggestion dropdown with neo-brutalist border */
 .nb-search-suggestions {
   position: absolute;
   top: calc(100% + 8px);
@@ -502,7 +499,7 @@ body, html {
   gap: 20px;
 }
 
-/* ── DEFAULT VIEW: LISTED IPOS & COMPANIES GRID (IMAGE 2 AESTHETIC) ─ */
+/* ── DEFAULT VIEW: IPOs & LISTED CATALOG ────────────────────────── */
 .nb-ipos-container {
   display: flex;
   flex-direction: column;
@@ -611,7 +608,7 @@ body, html {
   flex-shrink: 0;
 }
 
-/* ── NEO-BRUTALIST PAGINATION ────────────────────────────────────── */
+/* ── PAGINATION BAR ─────────────────────────────────────────────── */
 .nb-pagination-bar {
   display: flex;
   align-items: center;
@@ -665,7 +662,7 @@ body, html {
   box-shadow: none;
 }
 
-/* ── TOP 4 METRIC STAT CARDS (IMAGE 1 STYLE) ────────────────────── */
+/* ── TOP 4 METRIC STAT CARDS ────────────────────────────────────── */
 .nb-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -744,10 +741,10 @@ body, html {
   margin-top: 4px;
 }
 
-/* ── CHARTS ROW (IMAGE 1 STYLE) ─────────────────────────────────── */
+/* ── INTERACTIVE DETAILED PRECISION CHART ────────────────────────── */
 .nb-charts-row {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.7fr 0.9fr;
   gap: 16px;
 }
 
@@ -759,6 +756,7 @@ body, html {
   padding: 20px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .nb-chart-header {
@@ -767,7 +765,8 @@ body, html {
   justify-content: space-between;
   border-bottom: 1.5px solid var(--nb-border);
   padding-bottom: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  gap: 12px;
 }
 
 .nb-chart-title {
@@ -786,28 +785,92 @@ body, html {
   display: block;
 }
 
-.nb-pill-btn {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 11.5px;
-  font-weight: 700;
+/* Timeframe buttons cluster */
+.nb-timeframe-cluster {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   background: var(--nb-surface-alt);
   border: 1.5px solid var(--nb-border);
-  padding: 4px 10px;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.nb-tf-btn {
+  background: transparent;
+  border: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
-  box-shadow: var(--nb-shadow-sm);
+  color: var(--nb-text);
+  transition: all 0.1s;
+}
+.nb-tf-btn.active {
+  background: var(--nb-border);
+  color: #fff;
 }
 
-.nb-step-svg {
+/* Live tooltip readout banner in chart header */
+.nb-chart-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.nb-cr-price {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--nb-text);
+}
+
+.nb-cr-date {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--nb-text-muted);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.nb-cr-delta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.nb-cr-delta.up { color: #0E8074; }
+.nb-cr-delta.dn { color: #C81E1E; }
+
+/* SVG Canvas area */
+.nb-chart-svg-wrap {
+  position: relative;
   width: 100%;
-  height: 160px;
+  cursor: crosshair;
 }
 
+.nb-detailed-svg {
+  width: 100%;
+  height: 190px;
+  display: block;
+}
+
+.nb-axis-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  fill: #71717A;
+}
+
+/* ── VOLUME ACTIVITY BARS ───────────────────────────────────────── */
 .nb-bars-container {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  height: 160px;
+  height: 190px;
   padding: 10px 10px 0;
   gap: 10px;
 }
