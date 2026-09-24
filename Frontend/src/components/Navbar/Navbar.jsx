@@ -1,31 +1,44 @@
 import React from 'react';
-import Button from '../Button/Button';
 import './Navbar.css';
 
 export default function Navbar({ onGetStarted }) {
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <header className="navbar">
-      <div className="navbar-brand">
-        <span className="brand-dot"></span>
-        <span>public</span>
+    <header className="ts-navbar">
+      <div className="ts-navbar-brand" onClick={onGetStarted}>
+        <div className="ts-brand-icon">
+          <span>TX</span>
+        </div>
+        <span className="ts-brand-title">TradeX</span>
+        <span className="ts-brand-badge">PRO ENGINE</span>
       </div>
 
-      <nav>
-        <ul className="navbar-menu">
-          <li className="navbar-link">Invest</li>
-          <li className="navbar-link">Resources</li>
-          <li className="navbar-link">Company</li>
-          <li className="navbar-link">Premium</li>
-        </ul>
+      <nav className="ts-nav-center">
+        <span className="ts-nav-item" onClick={() => scrollToSection('features-bento')}>
+          Bento Features
+        </span>
+        <span className="ts-nav-item" onClick={() => scrollToSection('engine-speed')}>
+          Engine Speed
+        </span>
+        <span className="ts-nav-item" onClick={() => scrollToSection('benchmark-matrix')}>
+          Benchmark Matrix
+        </span>
+        <span className="ts-nav-item" onClick={onGetStarted}>
+          Indian Startups (₹)
+        </span>
       </nav>
 
-      <div className="navbar-actions">
-        <Button variant="secondary" size="sm" onClick={onGetStarted}>
-          Sign In
-        </Button>
-        <Button variant="primary" size="sm" onClick={onGetStarted}>
-          Get Started
-        </Button>
+      <div className="ts-nav-actions">
+        <button className="ts-nav-btn primary" onClick={onGetStarted}>
+          <span>Launch Terminal</span>
+          <span className="ts-btn-arrow">↗</span>
+        </button>
       </div>
     </header>
   );
