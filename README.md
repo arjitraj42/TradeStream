@@ -4,6 +4,63 @@ A production-ready, high-performance **Stock Market Intelligence, Trading Platfo
 
 ---
 
+## 🏛️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Frontend (React + Vite)"]
+        UI["User Interface (Neo-Brutalist Theme)"]
+        ME["In-Memory Matching Engine (MatchingEngine.js)"]
+        TP["Trading Console (TradingPage.jsx)"]
+        ES["Engine Simulator (EngineSimulatorPage.jsx)"]
+        DB["Dashboard & IPO Directory (Dashboard.jsx)"]
+    end
+
+    subgraph AI_Agents ["Autonomous Simulation Fleet"]
+        BA["Bull Agent 🐂"]
+        BEA["Bear Agent 🐻"]
+        MM["Market Maker Agent ⚖️"]
+        AUT["Continuous Simulation Loop ⚡"]
+    end
+
+    subgraph Backend ["Backend API & Real-Time Server (Express + Socket.IO)"]
+        API["REST API Router (/api/orders, /api/context)"]
+        SCHED["Node-Cron Scheduler (7s Ticks)"]
+        SOC["Socket.IO Event Server"]
+        FIN["Finnhub Quotes Adapter"]
+        TAV["Tavily AI Intelligence Adapter"]
+    end
+
+    subgraph Database ["Persistence Layer"]
+        PRISMA["Prisma ORM (v6.4.1)"]
+        PG[(PostgreSQL Database)]
+    end
+
+    %% Client Interactions
+    UI --> TP
+    UI --> ES
+    UI --> DB
+
+    %% Matching Engine Flow
+    ES <--> ME
+    AI_Agents -->|Order Injection| ME
+    ME -->|Order Book / Fills / Latency| ES
+
+    %% Backend Flow
+    TP <-->|HTTP POST / GET| API
+    DB <-->|Live Quotes & AI Intel| API
+    API --> FIN
+    API --> TAV
+    API --> SOC
+    SCHED -->|Trigger Market Ticks| SOC
+
+    %% Database Flow
+    API --> PRISMA
+    PRISMA --> PG
+```
+
+---
+
 ## 🌟 Key Features & Highlights
 
 ### 1. ⚙️ In-Memory Price-Time Priority Matching Engine (`MatchingEngine.js`)
@@ -15,11 +72,13 @@ A production-ready, high-performance **Stock Market Intelligence, Trading Platfo
 - **Partial Fills**: Fills partial liquidity and places remaining limit quantity into the order book queue.
 - **Microsecond Latency Tracking**: Real-time performance tracking measuring matching execution latency in milliseconds/microseconds (`performance.now()`).
 
+---
+
 ### 2. 📊 Matching Engine Simulator Dashboard (`EngineSimulatorPage.jsx`)
 - **Engine Metrics KPI Dashboard**: Live tracking of *Orders Processed*, *Trades Executed*, *Orders / Sec (Throughput)*, *Average Latency (ms)*, *Best Bid/Ask & Spread*, and *Open Depth*.
 - **Live Order Book & Depth Visualizer**:
   - Top 10 Bids (Green depth bars) & Asks (Red depth bars).
-  - Live Mid Price & Spread banner.
+  - Live Mid Price & Spread banner (`Ask - Bid`).
   - Click-to-Price auto-filling into Order Entry.
 - **Order Flow Visual Pipeline**: 3-stage animated order flow: `1. Order Entry Queue ➜ 2. Matching Engine ➜ 3. Trade Execution / Book`.
 - **Open Orders Management**: Filterable active limit orders table with one-click **Cancel** order capabilities.
@@ -83,7 +142,7 @@ TradeValue/
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Quick Start & Deployment Guide
 
 ### 1. Installation
 Clone the repository and install dependencies:
@@ -98,27 +157,28 @@ cd Frontend && npm install
 cd ../backend && npm install
 ```
 
-### 2. Run Local Development Server
+### 2. Environment Configuration (`backend/.env`)
+```env
+PORT=3000
+NODE_ENV=development
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/trader_simulation?schema=public"
+FINNHUB_API=d95v1l9r01qj66kq12igd95v1l9r01qj66kq12j0
+TAVILY_API=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
+```
+
+### 3. Database & Prisma Setup
+```bash
+cd backend
+npx prisma generate --schema=prisma/schema.prisma
+npx prisma db push --schema=prisma/schema.prisma
+```
+
+### 4. Run Local Development Server
 Start the Vite dev server from the root or Frontend directory:
 ```bash
 npm run dev
 ```
 Open **`http://localhost:5173`** (or `http://localhost:5174`) in your browser.
-
----
-
-## 🧪 How to Verify Matching Engine Features
-
-1. Open **`http://localhost:5174/`** in your browser.
-2. Click **`⚡ Engine Simulator`** on the top navigation bar.
-3. **Test Order Matching**:
-   - Submit a BUY Limit order @ `$180.50` x `10` shares.
-   - Observe immediate execution against Ask liquidity in the **Live Executed Trade Feed**.
-4. **Test AI Agents**:
-   - Click **`🐂 Bull Agent`**, **`🐻 Bear Agent`**, or **`⚖️ Market Maker`**.
-   - Watch orders flow through the 3-step pipeline and populate the order book.
-5. **Test Order Cancellation**:
-   - Click **`Cancel`** next to any active order in the **Open Orders Management** panel to see instant book removal.
 
 ---
 
