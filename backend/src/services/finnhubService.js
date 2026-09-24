@@ -10,16 +10,25 @@ dotenv.config({ path: path.resolve(__dirname, '../../../backend/.env') });
 const FINNHUB_KEY = process.env.FINNHUB_API || 'd95v1l9r01qj66kq12igd95v1l9r01qj66kq12j0';
 const FINNHUB_BASE = 'https://finnhub.io/api/v1';
 
+const quoteCache = new Map();
+const CACHE_TTL_MS = 120000; // 2 minutes
+
 export const finnhubService = {
   async getQuote(symbol) {
+    const sym = symbol.toUpperCase();
+    const cached = quoteCache.get(sym);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     try {
       const res = await axios.get(`${FINNHUB_BASE}/quote`, {
-        params: { symbol: symbol.toUpperCase(), token: FINNHUB_KEY },
+        params: { symbol: sym, token: FINNHUB_KEY },
         timeout: 6000,
       });
       const q = res.data;
       if (q && q.c !== undefined && q.c !== 0) {
-        return {
+        const quoteResult = {
           currentPrice: q.c,
           change: q.d,
           percentChange: q.dp,
@@ -29,10 +38,13 @@ export const finnhubService = {
           prevClose: q.pc,
           isUp: q.d >= 0,
         };
+        quoteCache.set(sym, { timestamp: Date.now(), data: quoteResult });
+        return quoteResult;
       }
       return null;
     } catch (err) {
-      console.warn(`Finnhub quote error for ${symbol}:`, err.message);
+      if (cached) return cached.data;
+      console.warn(`Finnhub quote notice for ${symbol}:`, err.message);
       return null;
     }
   },
@@ -144,6 +156,28 @@ export const finnhubService = {
     } catch (err) {
       console.warn(`Finnhub recommendation error for ${symbol}:`, err.message);
       return { rating: 'Strong Buy (88% Consensus)' };
+    }
+  },
+
+  async searchSymbol(query) {
+    if (!query) return [];
+    try {
+      const res = await axios.get(`${FINNHUB_BASE}/search`, {
+        params: { q: query, token: FINNHUB_KEY },
+        timeout: 6000,
+      });
+      if (res.data && Array.isArray(res.data.result)) {
+        return res.data.result.filter((r) => r.type === 'Common Stock' || !r.type).map((r) => ({
+          symbol: r.symbol,
+          name: r.description,
+          displaySymbol: r.displaySymbol || r.symbol,
+          type: r.type,
+        }));
+      }
+      return [];
+    } catch (err) {
+      console.warn(`Finnhub search error for ${query}:`, err.message);
+      return [];
     }
   },
 

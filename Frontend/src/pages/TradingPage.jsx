@@ -196,8 +196,8 @@ export default function TradingPage({ company, onBack }) {
       <header className="tp-navbar">
         <div className="tp-nav-left">
           <div className="tp-logo">
-            <span className="tp-logo-badge">TS</span>
-            <span>TradeStream Platform</span>
+            <span className="tp-logo-badge">TX</span>
+            <span>TradeX Platform</span>
           </div>
           <button className="tp-back-btn" onClick={onBack}>
             ← Back to Dashboard
