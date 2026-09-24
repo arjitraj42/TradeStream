@@ -9,16 +9,20 @@ export const orderService = {
     try {
       const response = await fetch(`${API_BASE_URL}/orders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(orderPayload),
       });
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.error || 'Failed to place order');
       }
+
       return await response.json();
     } catch (error) {
-      console.warn('Order execution local simulation fallback:', error.message);
+      console.warn('Order execution fallback simulation:', error.message);
       return {
         success: true,
         data: {
