@@ -24,7 +24,7 @@ export default function EngineSimulatorPage({ onBack }) {
   const [queue, setQueue] = useState([]);
 
   // AI Agent States
-  const [aiActive, setAiActive] = useState({ bull: false, bear: false, marketMaker: false, autoLoop: false });
+  const [aiActive, setAiActive] = useState({ bull: false, bear: false, marketMaker: false, autoLoop: true });
 
   // Refresh UI snapshots from engine
   const refreshEngineState = () => {
