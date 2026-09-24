@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import Welcome from './pages/Welcome';
 import Dashboard from './pages/Dashboard';
 import TradingPage from './pages/TradingPage';
+import EngineSimulatorPage from './pages/EngineSimulatorPage';
 
 function App() {
   const [page, setPage] = useState('home');
@@ -27,12 +28,19 @@ function App() {
         <Dashboard
           onBackToHome={() => setPage('home')}
           onOpenTradePage={handleOpenTradePage}
+          onOpenEngineSimulator={() => setPage('engine')}
         />
       )}
 
       {page === 'trading' && (
         <TradingPage
           company={activeTradingCompany}
+          onBack={() => setPage('dashboard')}
+        />
+      )}
+
+      {page === 'engine' && (
+        <EngineSimulatorPage
           onBack={() => setPage('dashboard')}
         />
       )}

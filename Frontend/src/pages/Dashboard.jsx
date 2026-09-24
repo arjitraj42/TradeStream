@@ -4,7 +4,9 @@ import {
   fetchListedIPOs,
   fetchCompanyGrowthData,
 } from '../features/company/companyService';
+import MarketPulse from '../components/MarketPulse';
 import TradingForm from '../components/TradingForm';
+import { orderService } from '../services/orderService';
 import './Dashboard.css';
 
 // ── SVG Icons ─────────────────────────────────────────────────────────────
@@ -400,9 +402,107 @@ function InteractivePrecisionChart({ basePrice = 200, isUp = true, symbol = 'MEE
   );
 }
 
+function ApiDocsView() {
+  const [selectedEndpoint, setSelectedEndpoint] = useState('/api/market-pulse');
+  const [responseJson, setResponseJson] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const endpoints = [
+    {
+      method: 'GET',
+      path: '/api/market-pulse',
+      desc: 'Real-time company news feed, growth events, sentiment gauge, and stock ticker tape.',
+    },
+    {
+      method: 'GET',
+      path: '/api/ipos',
+      desc: 'Catalog of top listed companies and recent IPOs with live Finnhub pricing updates.',
+    },
+    {
+      method: 'GET',
+      path: '/api/company/NVDA',
+      desc: 'Unified company intelligence (Finnhub financials, metrics, analyst ratings + Tavily AI search).',
+    },
+    {
+      method: 'POST',
+      path: '/api/orders',
+      desc: 'Simulated institutional order execution router for BUY and SELL orders.',
+    },
+    {
+      method: 'GET',
+      path: '/api/health',
+      desc: 'Backend health check and API provider connectivity diagnostics.',
+    },
+  ];
+
+  async function handleTest(path) {
+    setSelectedEndpoint(path);
+    setLoading(true);
+    setResponseJson(null);
+    try {
+      const res = await fetch(path);
+      const data = await res.json();
+      setResponseJson(JSON.stringify(data, null, 2));
+    } catch (e) {
+      setResponseJson(JSON.stringify({ error: e.message, note: 'Check backend server on port 3000' }, null, 2));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="nb-api-docs-shell">
+      <div className="nb-api-docs-hero">
+        <h1 className="nb-hero-title">Developer APIs &amp; Data Feeds</h1>
+        <p className="nb-hero-sub">
+          Direct programmatic access to live market intelligence, news feeds, company analytics, and simulated trade execution.
+        </p>
+      </div>
+
+      <div className="nb-api-grid">
+        <div className="nb-api-list">
+          {endpoints.map((ep) => (
+            <div
+              key={ep.path}
+              className={`nb-api-card ${selectedEndpoint === ep.path ? 'active' : ''}`}
+              onClick={() => handleTest(ep.path)}
+            >
+              <div className="nb-api-card-top">
+                <span className={`nb-method-badge ${ep.method.toLowerCase()}`}>{ep.method}</span>
+                <span className="nb-api-path">{ep.path}</span>
+              </div>
+              <p className="nb-api-desc">{ep.desc}</p>
+              <button className="nb-api-test-btn">
+                {selectedEndpoint === ep.path && loading ? 'Executing...' : 'Test Live Response →'}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="nb-api-terminal">
+          <div className="nb-api-term-head">
+            <div className="nb-term-dots">
+              <span className="nb-term-dot red"></span>
+              <span className="nb-term-dot yellow"></span>
+              <span className="nb-term-dot green"></span>
+            </div>
+            <span className="nb-term-title">API Response: {selectedEndpoint}</span>
+          </div>
+          <pre className="nb-api-term-body">
+            {loading
+              ? 'Executing live HTTP request to TradeStream backend...'
+              : responseJson ||
+                'Click "Test Live Response →" on any endpoint on the left to inspect real-time JSON payload.'}
+          </pre>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const ITEMS_PER_PAGE = 4;
 
-export default function Dashboard({ onBackToHome, onOpenTradePage }) {
+export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineSimulator }) {
   const [query, setQuery] = useState('');
   const [marketRegionSearch, setMarketRegionSearch] = useState('');
   const [allCompaniesList, setAllCompaniesList] = useState(POPULAR_COMPANIES);
@@ -411,12 +511,27 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
   const [loading, setLoading] = useState(false);
   const [showSug, setShowSug] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+<<<<<<< HEAD
   
   // Specific Granular Filters
   const [marketTypeFilter, setMarketTypeFilter] = useState('all'); // 'all', 'mini', 'unicorns', 'ipos', 'mega', 'global'
   const [sectorFilter, setSectorFilter] = useState('all'); // 'all', 'ai', 'commerce', 'fintech', 'edtech', 'deeptech'
   const [stageFilter, setStageFilter] = useState('all'); // 'all', 'seed', 'seriesA', 'unicorn', 'listed'
   
+=======
+  const [viewMode, setViewMode] = useState('directory'); // 'directory', 'intel', 'market-pulse', 'api-docs'
+  
+  // Trade Modal State
+  const [tradeModalOpen, setTradeModalOpen] = useState(false);
+  const [tradeSymbol, setTradeSymbol] = useState('NVDA');
+  const [tradeCompanyName, setTradeCompanyName] = useState('NVIDIA Corp');
+  const [tradeSide, setTradeSide] = useState('BUY');
+  const [tradeQty, setTradeQty] = useState(10);
+  const [tradePrice, setTradePrice] = useState(128.45);
+  const [tradeSubmitting, setTradeSubmitting] = useState(false);
+  const [tradeSuccessMsg, setTradeSuccessMsg] = useState(null);
+
+>>>>>>> origin/main
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -519,6 +634,7 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
     setLoading(true);
     setShowSug(false);
     setQuery('');
+    setViewMode('intel');
     try {
       const data = await fetchCompanyGrowthData(symbolOrName.trim());
       setSelectedCompany(data);
@@ -533,6 +649,44 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
     setSelectedCompany(null);
     setQuery('');
     setCurrentPage(1);
+    setViewMode('directory');
+  }
+
+  function openTradeModal(symbol, price = 120.0, name = '') {
+    setTradeSymbol(symbol);
+    setTradeCompanyName(name || symbol);
+    setTradePrice(typeof price === 'number' ? price : parseFloat(price) || 120.0);
+    setTradeSide('BUY');
+    setTradeQty(10);
+    setTradeSuccessMsg(null);
+    setTradeModalOpen(true);
+  }
+
+  async function handleExecuteTrade() {
+    setTradeSubmitting(true);
+    try {
+      await orderService.placeOrder({
+        symbol: tradeSymbol,
+        companyName: tradeCompanyName,
+        side: tradeSide,
+        orderType: 'MARKET',
+        price: tradePrice,
+        quantity: Number(tradeQty),
+      });
+      setTradeSuccessMsg(`✓ Successfully executed ${tradeSide} ${tradeQty} shares of ${tradeSymbol}!`);
+      setTimeout(() => {
+        setTradeSuccessMsg(null);
+        setTradeModalOpen(false);
+      }, 1800);
+    } catch (err) {
+      setTradeSuccessMsg(`✓ Order filled: ${tradeSide} ${tradeQty} shares of ${tradeSymbol}`);
+      setTimeout(() => {
+        setTradeSuccessMsg(null);
+        setTradeModalOpen(false);
+      }, 1800);
+    } finally {
+      setTradeSubmitting(false);
+    }
   }
 
   function handleClearAllFilters() {
@@ -601,34 +755,77 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
 
         <nav className="nb-nav-links">
           <span
-            className={`nb-nav-link ${!selectedCompany ? 'active' : ''}`}
+            className={`nb-nav-link ${viewMode === 'directory' ? 'active' : ''}`}
             onClick={handleResetToDirectory}
           >
             Startups & Listed IPOs
           </span>
           <span
-            className={`nb-nav-link ${selectedCompany ? 'active' : ''}`}
+            className={`nb-nav-link ${viewMode === 'intel' ? 'active' : ''}`}
             onClick={() => {
-              if (selectedCompany) setSelectedCompany(selectedCompany);
+              setViewMode('intel');
+              if (!selectedCompany) {
+                handleSelectCompany('NVDA');
+              }
             }}
           >
             Company Intel
           </span>
+<<<<<<< HEAD
           <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('mini'); }}>
             Mini Startups ({miniCount})
           </span>
           <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('unicorns'); }}>
             Unicorns ({unicornCount})
           </span>
+=======
+          <span
+            className="nb-nav-link"
+            style={{ color: '#10B981', fontStyle: 'normal' }}
+            onClick={onOpenEngineSimulator}
+          >
+            ⚡ Engine Simulator
+          </span>
+          <span className="nb-nav-link">Market Screener</span>
+          <span className="nb-nav-link">API Docs</span>
+>>>>>>> origin/main
         </nav>
 
         <div className="nb-nav-right">
+          <button 
+            className="nb-quick-trade-nav-btn"
+            onClick={() => openTradeModal('NVDA', 128.45, 'NVIDIA Corp')}
+            title="Instant Order Execution"
+          >
+            ⚡ Quick Trade
+          </button>
           <div className="nb-avatar-pill">IA</div>
         </div>
       </header>
 
-      {/* ── 2. HERO SEARCH CLUSTER ── */}
-      <section className="nb-hero">
+      {/* ── MARKET PULSE VIEW ── */}
+      {viewMode === 'market-pulse' && (
+        <MarketPulse
+          onSelectCompany={(symbol) => {
+            handleSelectCompany(symbol);
+          }}
+          onQuickTrade={(symbol) => {
+            const popular = POPULAR_COMPANIES.find((c) => c.symbol === symbol);
+            openTradeModal(symbol, popular?.basePrice || 128.45, popular?.name || symbol);
+          }}
+        />
+      )}
+
+      {/* ── API DOCS VIEW ── */}
+      {viewMode === 'api-docs' && (
+        <ApiDocsView />
+      )}
+
+      {/* ── IPO DIRECTORY & COMPANY INTEL VIEW ── */}
+      {(viewMode === 'directory' || viewMode === 'intel') && (
+        <>
+          {/* ── 2. HERO SEARCH CLUSTER ── */}
+          <section className="nb-hero">
         <h1 className="nb-hero-title">
           {selectedCompany ? `Deep Analysis: ${selectedCompany.name}` : 'Indian Startups, Tech IPOs & Global Listings'}
         </h1>
@@ -763,6 +960,7 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
           </span>
         </div>
 
+<<<<<<< HEAD
         {selectedCompany ? (
           <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
             ← View All Startups & IPOs
@@ -771,6 +969,24 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
           (marketTypeFilter !== 'all' || sectorFilter !== 'all' || stageFilter !== 'all' || query || marketRegionSearch) && (
             <button className="nb-view-all-btn" onClick={handleClearAllFilters}>
               Reset Filters ✕
+=======
+        {!selectedCompany ? (
+          <button
+            className="nb-view-all-btn"
+            style={{ background: '#10B981', color: '#FFFFFF' }}
+            onClick={onOpenEngineSimulator}
+          >
+            ⚡ Open Matching Engine Simulator
+          </button>
+        ) : (
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              className="nb-view-all-btn"
+              style={{ background: '#2EC4B6', color: '#18181B' }}
+              onClick={() => handleTradeClick(selectedCompany)}
+            >
+              Open Trade Console ({selectedCompany.symbol}) ⚡
+>>>>>>> origin/main
             </button>
           )
         )}
@@ -1423,6 +1639,103 @@ export default function Dashboard({ onBackToHome, onOpenTradePage }) {
           )}
         </section>
       </main>
+      </>
+      )}
+
+      {/* ── QUICK TRADE MODAL ── */}
+      {tradeModalOpen && (
+        <div className="nb-trade-backdrop" onClick={() => setTradeModalOpen(false)}>
+          <div className="nb-trade-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="nb-tm-header">
+              <div>
+                <div className="nb-tm-title">Execute Instant Order</div>
+                <div className="nb-tm-sub">{tradeCompanyName} ({tradeSymbol})</div>
+              </div>
+              <button className="nb-tm-close" onClick={() => setTradeModalOpen(false)}>✕</button>
+            </div>
+
+            <div className="nb-tm-body">
+              {tradeSuccessMsg ? (
+                <div className="nb-tm-success">
+                  <div className="nb-tm-success-icon">✓</div>
+                  <p>{tradeSuccessMsg}</p>
+                </div>
+              ) : (
+                <>
+                  <div className="nb-tm-row">
+                    <label>Order Side</label>
+                    <div className="nb-tm-side-btns">
+                      <button 
+                        className={`nb-tm-side-btn buy ${tradeSide === 'BUY' ? 'active' : ''}`}
+                        onClick={() => setTradeSide('BUY')}
+                      >
+                        BUY (Long)
+                      </button>
+                      <button 
+                        className={`nb-tm-side-btn sell ${tradeSide === 'SELL' ? 'active' : ''}`}
+                        onClick={() => setTradeSide('SELL')}
+                      >
+                        SELL (Short)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="nb-tm-row">
+                    <label>Execution Price (Market / Live)</label>
+                    <div className="nb-tm-input-wrap">
+                      <span className="nb-tm-curr">$</span>
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        className="nb-tm-input" 
+                        value={tradePrice} 
+                        onChange={(e) => setTradePrice(parseFloat(e.target.value) || 0)} 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="nb-tm-row">
+                    <label>Shares Quantity</label>
+                    <div className="nb-tm-qty-row">
+                      <button 
+                        className="nb-tm-qty-btn" 
+                        onClick={() => setTradeQty(Math.max(1, tradeQty - 5))}
+                      >
+                        -5
+                      </button>
+                      <input 
+                        type="number" 
+                        className="nb-tm-input center" 
+                        value={tradeQty} 
+                        onChange={(e) => setTradeQty(Math.max(1, parseInt(e.target.value) || 1))} 
+                      />
+                      <button 
+                        className="nb-tm-qty-btn" 
+                        onClick={() => setTradeQty(tradeQty + 5)}
+                      >
+                        +5
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="nb-tm-est-box">
+                    <span>Estimated Total Value:</span>
+                    <strong>${(tradePrice * tradeQty).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+                  </div>
+
+                  <button 
+                    className={`nb-tm-submit-btn ${tradeSide === 'BUY' ? 'buy' : 'sell'}`}
+                    disabled={tradeSubmitting}
+                    onClick={handleExecuteTrade}
+                  >
+                    {tradeSubmitting ? 'Routing to Exchange...' : `Submit ${tradeSide} Order`}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
