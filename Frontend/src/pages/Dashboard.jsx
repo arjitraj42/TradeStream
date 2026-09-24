@@ -1225,7 +1225,7 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
                         style={{ background: '#2EC4B6', color: '#18181B' }}
                         onClick={() => handleTradeClick(item)}
                       >
-                        Trade ⚡
+                        Trade
                       </button>
                       <button
                         className="nb-action-btn"

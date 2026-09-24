@@ -128,7 +128,7 @@ export default function Home({ onGetStarted }) {
                       <div className="nbh-tvc-price-row">
                         <span className="nbh-tvc-price">{activeComp.price}</span>
                         <span className="nbh-tvc-chg up">{activeComp.change}</span>
-                        <span className="nbh-pill-tag coral">⚡ Tavily AI Risk: Low Beta</span>
+                        <span className="nbh-pill-tag coral">Tavily AI Risk: Low Beta</span>
                       </div>
                     </div>
 
@@ -341,7 +341,7 @@ export default function Home({ onGetStarted }) {
 
                   <div className="nbh-tvr-bottom">
                     <button className="nbh-btn-trade-launch">
-                      Execute Order ⚡
+                      Execute Order
                     </button>
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export default function Home({ onGetStarted }) {
                 Algorithmic trading agents (Momentum, Aggressive, Bear, Market Maker, Value) injecting continuous book liquidity.
               </p>
               <div className="nbh-bots-stack">
-                <div className="nbh-bot-item">⚡ MarketMaker Bot</div>
+                <div className="nbh-bot-item">🤖 MarketMaker Bot</div>
                 <div className="nbh-bot-item">🚀 Momentum Trader</div>
                 <div className="nbh-bot-item">🛡️ Bear Hedger</div>
               </div>

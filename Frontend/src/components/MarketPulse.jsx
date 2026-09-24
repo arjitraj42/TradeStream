@@ -154,7 +154,7 @@ export default function MarketPulse({ onSelectCompany, onQuickTrade }) {
           </div>
 
           <div className="mp-latency-badge">
-            <span className="mp-wifi-icon">⚡</span>
+            <span className="mp-latency-dot"></span>
             <span>LATENCY: <strong>14ms</strong></span>
           </div>
         </div>
@@ -409,7 +409,7 @@ export default function MarketPulse({ onSelectCompany, onQuickTrade }) {
                         }}
                         title={`Quick Trade ${item.symbol}`}
                       >
-                        ⚡ Quick Trade ({item.symbol})
+                        Quick Trade ({item.symbol})
                       </button>
                     </div>
 
