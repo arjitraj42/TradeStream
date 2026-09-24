@@ -210,8 +210,8 @@ Start the Vite dev server from the root directory:
 ```bash
 npm run dev
 ```
-Open **`http://localhost:5173`** (or `http://localhost:5174`) in your browser.
-
+Frontend : https://trade-stream-alpha.vercel.app/
+Backend  : https://tradestream-w1ys.onrender.com
 ### 5. 🌐 1-Click Vercel Deployment (Full-Stack Frontend + Serverless API)
 This project is configured to run 100% on **Vercel** with zero external servers needed:
 1. **Import the repository** into Vercel.
