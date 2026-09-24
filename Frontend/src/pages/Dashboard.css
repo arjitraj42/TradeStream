@@ -308,43 +308,62 @@ body, html {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .nb-results-count {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
+
 .nb-results-title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--nb-text);
+  letter-spacing: -0.5px;
 }
+
 .nb-count-badge {
   background: var(--nb-surface);
   border: var(--nb-border-width) solid var(--nb-border);
   box-shadow: var(--nb-shadow-sm);
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 4px;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   font-family: 'Space Grotesk', sans-serif;
+  color: var(--nb-text);
+  white-space: nowrap;
+}
+
+.nb-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .nb-view-all-btn {
   background: var(--nb-surface);
   border: var(--nb-border-width) solid var(--nb-border);
   box-shadow: var(--nb-shadow-sm);
-  padding: 6px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 13px;
+  font-weight: 800;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: transform 0.1s, box-shadow 0.1s;
+  white-space: nowrap;
+  transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
 }
 .nb-view-all-btn:hover {
   background: var(--nb-yellow);
