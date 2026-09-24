@@ -1,0 +1,43 @@
+:root {
+  /* Color Palette - Premium Off-White & Soft Slate Backgrounds */
+  --bg-main: #f5f7fa;
+  --bg-nav: rgba(245, 247, 250, 0.85);
+  --bg-card: #ffffff;
+  --bg-grid-cell: rgba(255, 255, 255, 0.4);
+  --bg-grid-hover: rgba(16, 185, 129, 0.08);
+
+  /* Primary Action Blue (as seen in public.com style) */
+  --color-primary: #0047ff;
+  --color-primary-hover: #0037c8;
+  --color-primary-light: rgba(0, 71, 255, 0.08);
+
+  /* Financial Green & Tickers */
+  --color-green: #00c805;
+  --color-green-light: #10b981;
+  --color-green-glow: rgba(0, 200, 5, 0.25);
+  --color-red: #ff3b30;
+
+  /* Text Colors */
+  --text-primary: #0d1117;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --text-inverse: #ffffff;
+
+  /* Borders & Shadows */
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --border-grid: #e2e8f0;
+  --border-grid-active: #10b981;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.12);
+
+  /* Spacing & Radius */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
