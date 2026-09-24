@@ -82,15 +82,20 @@ export default function TradingPage({ company, onBack }) {
       const randomQty = Math.floor(Math.random() * 20) + 5;
       const variation = (Math.random() - 0.5) * 0.01 * base;
       const execPrice = (base + variation).toFixed(2);
+      const totalVal = (parseFloat(execPrice) * randomQty).toFixed(2);
 
       history.push({
         id: `init-${index}-${Date.now()}`,
         time: timeStr,
         trader: item.trader,
+        symbol: targetCompany.symbol,
+        companyName: targetCompany.name,
+        currency: targetCompany.currency || '₹',
         side: item.side,
         orderType: item.type,
         quantity: randomQty,
         price: execPrice,
+        total: totalVal,
         isUser: false,
       });
     });
@@ -114,15 +119,20 @@ export default function TradingPage({ company, onBack }) {
       const randomQty = Math.floor(Math.random() * 30) + 1;
       const variation = (Math.random() - 0.5) * 0.008 * base;
       const execPrice = (base + variation).toFixed(2);
+      const totalVal = (parseFloat(execPrice) * randomQty).toFixed(2);
 
       const newLog = {
         id: `sim-${Date.now()}-${Math.random()}`,
         time: getFormattedTime(),
         trader: randomTrader,
+        symbol: targetCompany.symbol,
+        companyName: targetCompany.name,
+        currency: targetCompany.currency || '₹',
         side: randomSide,
         orderType: randomType,
         quantity: randomQty,
         price: execPrice,
+        total: totalVal,
         isUser: false,
       };
 
@@ -173,11 +183,15 @@ export default function TradingPage({ company, onBack }) {
       const userOrderLog = {
         id: `user-${Date.now()}`,
         time: getFormattedTime(),
-        trader: 'User (Manual)',
+        trader: 'User (You)',
+        symbol: targetCompany.symbol,
+        companyName: targetCompany.name,
+        currency: selectedCurrency,
         side,
         orderType,
         quantity: numericQty,
         price: numericPrice.toFixed(2),
+        total: (numericPrice * numericQty).toFixed(2),
         isUser: true,
       };
 
@@ -388,21 +402,32 @@ export default function TradingPage({ company, onBack }) {
                 <table className="tp-log-table">
                   <thead>
                     <tr>
-                      <th style={{ width: '22%' }}>Time</th>
-                      <th style={{ width: '38%' }}>Trader Type</th>
-                      <th style={{ width: '18%', textAlign: 'center' }}>Side</th>
-                      <th style={{ width: '22%', textAlign: 'right' }}>Order</th>
+                      <th>Time</th>
+                      <th>Trader Type</th>
+                      <th>Target Asset</th>
+                      <th style={{ textAlign: 'center' }}>Side</th>
+                      <th style={{ textAlign: 'center' }}>Order</th>
+                      <th style={{ textAlign: 'right' }}>Price</th>
+                      <th style={{ textAlign: 'right' }}>Qty</th>
+                      <th style={{ textAlign: 'right' }}>Total Value</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orderHistory.map((item) => {
                       const itemIsBuy = item.side === 'BUY';
+                      const curr = item.currency || selectedCurrency || '₹';
+                      const totalVal = item.total || (parseFloat(item.price) * (item.quantity || 1)).toFixed(2);
                       return (
                         <tr key={item.id} className={item.isUser ? 'is-user' : ''}>
-                          <td>{item.time}</td>
+                          <td style={{ whiteSpace: 'nowrap' }}>{item.time}</td>
                           <td>
                             <span className={`tp-trader-name ${item.isUser ? 'user' : ''}`}>
                               {item.trader}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="tp-asset-pill">
+                              {item.symbol || targetCompany.symbol}
                             </span>
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -410,8 +435,19 @@ export default function TradingPage({ company, onBack }) {
                               {item.side}
                             </span>
                           </td>
-                          <td style={{ textAlign: 'right', color: '#52525B', fontWeight: 800 }}>
-                            {item.orderType}
+                          <td style={{ textAlign: 'center' }}>
+                            <span className="tp-badge-order">
+                              {item.orderType}
+                            </span>
+                          </td>
+                          <td style={{ textAlign: 'right', fontWeight: 900, fontFamily: 'var(--tp-mono)' }}>
+                            {curr}{item.price}
+                          </td>
+                          <td style={{ textAlign: 'right', fontFamily: 'var(--tp-mono)' }}>
+                            {item.quantity}
+                          </td>
+                          <td style={{ textAlign: 'right', fontWeight: 900, color: itemIsBuy ? '#059669' : '#DC2626', fontFamily: 'var(--tp-mono)' }}>
+                            {curr}{totalVal}
                           </td>
                         </tr>
                       );

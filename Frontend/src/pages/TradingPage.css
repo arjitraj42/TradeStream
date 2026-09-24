@@ -217,7 +217,7 @@
 
 .tp-grid {
   display: grid;
-  grid-template-columns: 440px 1fr;
+  grid-template-columns: 380px 1fr;
   gap: 28px;
   align-items: start;
 }
@@ -618,6 +618,33 @@
 
 .tp-trader-name.user {
   color: #B45309;
+}
+
+/* Asset & Order Badges */
+.tp-asset-pill {
+  display: inline-block;
+  background: var(--tp-yellow);
+  color: var(--tp-black);
+  border: 1.5px solid var(--tp-black);
+  box-shadow: 1.5px 1.5px 0 var(--tp-black);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.tp-badge-order {
+  display: inline-block;
+  background: #FAF8F4;
+  color: #52525B;
+  border: 1px solid #D4D4D8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
 }
 
 /* Side Badges */

@@ -1014,6 +1014,15 @@ app.post('/api/orders', (req, res) => {
   });
 });
 
+app.get('/api/news', async (req, res) => {
+  try {
+    const news = await finnhubService.getGeneralNews();
+    res.json({ success: true, data: news });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('/api/context', (req, res) => {
   res.json({
     success: true,

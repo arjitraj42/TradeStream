@@ -337,3 +337,18 @@ export async function fetchMarketPulseData() {
     ],
   };
 }
+
+export async function fetchMarketNews() {
+  try {
+    const res = await fetch('/api/news');
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.data)) {
+        return data.data;
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to fetch market news:', err.message);
+  }
+  return [];
+}

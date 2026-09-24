@@ -755,21 +755,10 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
             Startups & Listed IPOs
           </span>
           <span
-            className={`nb-nav-link ${viewMode === 'intel' ? 'active' : ''}`}
-            onClick={() => {
-              setViewMode('intel');
-              if (!selectedCompany) {
-                handleSelectCompany('NVDA');
-              }
-            }}
+            className={`nb-nav-link ${viewMode === 'market-pulse' ? 'active' : ''}`}
+            onClick={() => setViewMode('market-pulse')}
           >
-            Company Intel
-          </span>
-          <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('mini'); }}>
-            Mini Startups ({miniCount})
-          </span>
-          <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('unicorns'); }}>
-            Unicorns ({unicornCount})
+            Live News Feed
           </span>
           <span
             className="nb-nav-link"
