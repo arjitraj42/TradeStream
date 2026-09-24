@@ -334,6 +334,27 @@ body, html {
   font-family: 'Space Grotesk', sans-serif;
 }
 
+.nb-view-all-btn {
+  background: var(--nb-surface);
+  border: var(--nb-border-width) solid var(--nb-border);
+  box-shadow: var(--nb-shadow-sm);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.nb-view-all-btn:hover {
+  background: var(--nb-yellow);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--nb-shadow);
+}
+
 /* ── MAIN TWO-COLUMN CONTAINER ─────────────────────────────────── */
 .nb-container {
   max-width: 1280px;
@@ -481,6 +502,169 @@ body, html {
   gap: 20px;
 }
 
+/* ── DEFAULT VIEW: LISTED IPOS & COMPANIES GRID (IMAGE 2 AESTHETIC) ─ */
+.nb-ipos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nb-ipo-item-card {
+  background: var(--nb-surface);
+  border: var(--nb-border-width) solid var(--nb-border);
+  box-shadow: var(--nb-shadow-lg);
+  border-radius: 8px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.nb-ipo-item-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #18181B;
+}
+
+.nb-ipo-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+}
+
+.nb-ipo-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: var(--nb-border-width) solid var(--nb-border);
+  box-shadow: var(--nb-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.nb-ipo-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nb-ipo-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nb-ipo-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--nb-text);
+}
+
+.nb-ipo-sub {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--nb-text-muted);
+}
+
+.nb-ipo-center-stats {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.nb-stat-pill-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: right;
+}
+
+.nb-spc-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--nb-text-sub);
+  letter-spacing: 0.5px;
+}
+
+.nb-spc-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nb-text);
+}
+.nb-spc-val.up { color: #0E8074; }
+.nb-spc-val.dn { color: #C81E1E; }
+
+.nb-ipo-right-action {
+  flex-shrink: 0;
+}
+
+/* ── NEO-BRUTALIST PAGINATION ────────────────────────────────────── */
+.nb-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--nb-surface);
+  border: var(--nb-border-width) solid var(--nb-border);
+  box-shadow: var(--nb-shadow);
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin-top: 8px;
+}
+
+.nb-page-info {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nb-text-muted);
+}
+
+.nb-page-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nb-page-btn {
+  background: var(--nb-surface-alt);
+  border: 1.5px solid var(--nb-border);
+  box-shadow: var(--nb-shadow-sm);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.nb-page-btn:hover:not(:disabled) {
+  background: var(--nb-yellow);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--nb-shadow);
+}
+.nb-page-btn.active {
+  background: var(--nb-yellow);
+  box-shadow: var(--nb-shadow);
+  transform: translate(-1px, -1px);
+}
+.nb-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 /* ── TOP 4 METRIC STAT CARDS (IMAGE 1 STYLE) ────────────────────── */
 .nb-stats-grid {
   display: grid;
@@ -614,13 +798,11 @@ body, html {
   box-shadow: var(--nb-shadow-sm);
 }
 
-/* Stepped line chart styling (Image 1) */
 .nb-step-svg {
   width: 100%;
   height: 160px;
 }
 
-/* Vertical Bar chart styling (Image 1) */
 .nb-bars-container {
   display: flex;
   align-items: flex-end;
@@ -660,7 +842,7 @@ body, html {
   color: var(--nb-text-muted);
 }
 
-/* ── COMPANY PERFORMANCE DUMMY SECTION CARDS (IMAGE 2 STYLE) ────── */
+/* ── COMPANY PERFORMANCE SECTION CARDS ──────────────────────────── */
 .nb-company-card {
   background: var(--nb-surface);
   border: var(--nb-border-width) solid var(--nb-border);
@@ -823,5 +1005,13 @@ body, html {
   }
   .nb-charts-row {
     grid-template-columns: 1fr;
+  }
+  .nb-ipo-item-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .nb-ipo-center-stats {
+    width: 100%;
+    justify-content: space-between;
   }
 }

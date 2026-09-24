@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   POPULAR_COMPANIES,
-  COMPANY_FUNDAMENTALS,
+  fetchListedIPOs,
   fetchCompanyGrowthData,
 } from '../features/company/companyService';
 import './Dashboard.css';
@@ -34,7 +34,7 @@ const ChevronDown = () => (
   </svg>
 );
 
-// ── Neo-Brutalist Stepped Area Chart (Matching Image 1) ────────────────────
+// ── Stepped Area Chart ────────────────────────────────────────────────────
 function SteppedChart({ data = [], isUp = true }) {
   if (!data || data.length === 0) return null;
   const values = data.map((d) => d.value);
@@ -76,32 +76,41 @@ function SteppedChart({ data = [], isUp = true }) {
   );
 }
 
-export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
+const ITEMS_PER_PAGE = 4;
+
+export default function Dashboard({ onBackToHome }) {
   const [query, setQuery] = useState('');
   const [marketFilter, setMarketFilter] = useState('US / Global');
-  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [ipoList, setIpoList] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState(null); // null = default IPO directory view
   const [activeTab, setActiveTab] = useState('fundamentals');
   const [loading, setLoading] = useState(false);
   const [showSug, setShowSug] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const inputRef = useRef(null);
 
+  // Load IPOs directory on initial render
   useEffect(() => {
-    loadCompany(initialSymbol || 'AAPL');
-  }, [initialSymbol]);
+    async function loadCatalog() {
+      const list = await fetchListedIPOs();
+      setIpoList(list);
+    }
+    loadCatalog();
+  }, []);
 
-  const filtered = POPULAR_COMPANIES.filter(
+  const filteredSuggestions = (ipoList.length > 0 ? ipoList : POPULAR_COMPANIES).filter(
     (c) =>
       query.length > 0 &&
       (c.name.toLowerCase().includes(query.toLowerCase()) ||
         c.symbol.toLowerCase().includes(query.toLowerCase()))
   );
 
-  async function loadCompany(symbol) {
+  async function handleSelectCompany(symbol) {
     setLoading(true);
     setShowSug(false);
     setQuery('');
     try {
-      const data = await fetchCompanyGrowthData(symbol, '1M');
+      const data = await fetchCompanyGrowthData(symbol);
       setSelectedCompany(data);
     } catch (err) {
       console.error(err);
@@ -110,21 +119,34 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
     }
   }
 
+  function handleResetToDirectory() {
+    setSelectedCompany(null);
+    setQuery('');
+    setCurrentPage(1);
+  }
+
+  // Pagination calculation for default directory
+  const totalPages = Math.ceil(ipoList.length / ITEMS_PER_PAGE) || 1;
+  const displayedIpos = ipoList.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   const currentMeta = POPULAR_COMPANIES.find((c) => c.symbol === selectedCompany?.symbol) || {
-    name: selectedCompany?.name || 'Apple Inc.',
-    symbol: selectedCompany?.symbol || 'AAPL',
-    sector: selectedCompany?.sector || 'Technology',
+    name: selectedCompany?.name || 'Company Inc.',
+    symbol: selectedCompany?.symbol || 'TICKER',
+    sector: selectedCompany?.sector || 'Market',
     color: '#18181B',
-    initials: 'AP',
-    marketCap: '$3.42T',
-    basePrice: 228.87,
-    change: '+1.42%',
-    isUp: true,
+    initials: selectedCompany?.symbol?.slice(0, 2) || 'CO',
+    marketCap: selectedCompany?.marketCap || '$2.40T',
+    basePrice: selectedCompany?.rawPrice || 150.0,
+    change: selectedCompany?.change || '+1.42%',
+    isUp: selectedCompany?.isUp !== false,
   };
 
   return (
     <div className="nb-shell">
-      {/* ── 1. NEO-BRUTALIST TOP NAVBAR ── */}
+      {/* ── 1. TOP NAVBAR ── */}
       <header className="nb-navbar">
         <div className="nb-nav-left">
           <div className="nb-logo" onClick={onBackToHome}>
@@ -137,9 +159,21 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
         </div>
 
         <nav className="nb-nav-links">
-          <span className="nb-nav-link active">Company Intel</span>
+          <span
+            className={`nb-nav-link ${!selectedCompany ? 'active' : ''}`}
+            onClick={handleResetToDirectory}
+          >
+            Listed IPOs & Stocks
+          </span>
+          <span
+            className={`nb-nav-link ${selectedCompany ? 'active' : ''}`}
+            onClick={() => {
+              if (selectedCompany) setSelectedCompany(selectedCompany);
+            }}
+          >
+            Company Intel
+          </span>
           <span className="nb-nav-link">Market Screener</span>
-          <span className="nb-nav-link">Risk Analysis</span>
           <span className="nb-nav-link">API Docs</span>
         </nav>
 
@@ -148,11 +182,15 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
         </div>
       </header>
 
-      {/* ── 2. HERO SEARCH CLUSTER (IMAGE 2 STYLE) ── */}
+      {/* ── 2. HERO SEARCH CLUSTER ── */}
       <section className="nb-hero">
-        <h1 className="nb-hero-title">Evaluate Any Company</h1>
+        <h1 className="nb-hero-title">
+          {selectedCompany ? `Deep Analysis: ${selectedCompany.name}` : 'Listed IPOs & Company Intelligence'}
+        </h1>
         <p className="nb-hero-sub">
-          Search real-time financial stats, fundamentals, and automated growth performance reports.
+          {selectedCompany
+            ? 'Live market stats from Finnhub & AI financial intelligence powered by Tavily Search.'
+            : 'Browse public listings with real-time stock values or search any specific ticker for deep evaluation.'}
         </p>
 
         <div className="nb-search-row">
@@ -161,11 +199,16 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search company ticker (e.g. AAPL, NVDA, TSLA)..."
+              placeholder="Search specific company ticker (e.g. AAPL, NVDA, RDDT, MSFT)..."
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
                 setShowSug(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && query.trim()) {
+                  handleSelectCompany(query.trim());
+                }
               }}
               onFocus={() => query && setShowSug(true)}
               onBlur={() => setTimeout(() => setShowSug(false), 200)}
@@ -196,26 +239,28 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
           <button
             className="nb-search-btn"
             onClick={() => {
-              if (filtered.length > 0) loadCompany(filtered[0].symbol);
+              if (query.trim()) handleSelectCompany(query.trim());
+              else if (filteredSuggestions.length > 0) handleSelectCompany(filteredSuggestions[0].symbol);
             }}
           >
             Search
           </button>
 
-          {showSug && filtered.length > 0 && (
+          {/* Search Autocomplete */}
+          {showSug && filteredSuggestions.length > 0 && (
             <div className="nb-search-suggestions">
-              {filtered.map((c) => (
+              {filteredSuggestions.map((c) => (
                 <div
                   key={c.symbol}
                   className="nb-sug-item"
-                  onMouseDown={() => loadCompany(c.symbol)}
+                  onMouseDown={() => handleSelectCompany(c.symbol)}
                 >
                   <div
                     style={{
                       width: 28,
                       height: 28,
                       borderRadius: 4,
-                      background: c.color,
+                      background: c.color || '#18181B',
                       border: '1.5px solid #18181B',
                       color: '#fff',
                       display: 'flex',
@@ -225,14 +270,14 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
                       fontSize: 11,
                     }}
                   >
-                    {c.initials}
+                    {c.initials || c.symbol.slice(0, 2)}
                   </div>
                   <div className="nb-sug-info">
                     <span className="nb-sug-name">{c.name}</span>
                     <span className="nb-sug-sym">{c.symbol} · {c.sector}</span>
                   </div>
-                  <span className={`nb-sug-chg ${c.isUp ? 'up' : 'dn'}`}>
-                    {c.change}
+                  <span className={`nb-sug-chg ${c.isUp !== false ? 'up' : 'dn'}`}>
+                    {c.change || '+1.42%'}
                   </span>
                 </div>
               ))}
@@ -241,17 +286,27 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
         </div>
       </section>
 
-      {/* ── 3. TRACKED RESULTS BANNER ── */}
+      {/* ── 3. STATUS / BREADCRUMB BANNER ── */}
       <div className="nb-status-row">
         <div className="nb-results-count">
-          <span className="nb-results-title">Company Intelligence</span>
-          <span className="nb-count-badge">Backend Ready Engine</span>
+          <span className="nb-results-title">
+            {selectedCompany ? `${selectedCompany.name} (${selectedCompany.symbol})` : 'Public Listings & IPO Catalog'}
+          </span>
+          <span className="nb-count-badge">
+            {selectedCompany ? (selectedCompany.source || 'Finnhub & Tavily Live') : `${ipoList.length} Active Public Listings`}
+          </span>
         </div>
+
+        {selectedCompany && (
+          <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
+            ← View All Listed IPOs
+          </button>
+        )}
       </div>
 
       {/* ── 4. TWO-COLUMN CONTAINER ── */}
       <main className="nb-container">
-        {/* LEFT COLUMN: FILTERS & BACKEND ENDPOINTS */}
+        {/* LEFT COLUMN: FILTERS & ENDPOINTS */}
         <aside className="nb-filter-card">
           <div className="nb-filter-head">
             <span className="nb-filter-title">Filters & APIs</span>
@@ -269,82 +324,173 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
           </div>
 
           <div className="nb-filter-group">
-            <label className="nb-fg-label">Intel Categories</label>
+            <label className="nb-fg-label">
+              {selectedCompany ? 'Intel Categories' : 'Listing Categories'}
+            </label>
             <div className="nb-nav-menu">
               <div
                 className={`nb-nav-tab ${activeTab === 'fundamentals' ? 'active' : ''}`}
                 onClick={() => setActiveTab('fundamentals')}
               >
-                <span>Fundamentals</span>
+                <span>{selectedCompany ? 'Fundamentals' : 'Recent IPOs'}</span>
                 <span>↗</span>
               </div>
               <div
                 className={`nb-nav-tab ${activeTab === 'risk' ? 'active' : ''}`}
                 onClick={() => setActiveTab('risk')}
               >
-                <span>Risk Factors</span>
+                <span>{selectedCompany ? 'Risk Factors' : 'Mega-Cap Stocks'}</span>
                 <span>↗</span>
               </div>
               <div
                 className={`nb-nav-tab ${activeTab === 'news' ? 'active' : ''}`}
                 onClick={() => setActiveTab('news')}
               >
-                <span>Events / News</span>
+                <span>{selectedCompany ? 'Events / News' : 'High Momentum'}</span>
                 <span>↗</span>
               </div>
               <div
                 className={`nb-nav-tab ${activeTab === 'history' ? 'active' : ''}`}
                 onClick={() => setActiveTab('history')}
               >
-                <span>Price History</span>
+                <span>{selectedCompany ? 'Price History' : 'Semiconductors'}</span>
                 <span>↗</span>
               </div>
             </div>
           </div>
 
           <div className="nb-filter-group">
-            <label className="nb-fg-label">Backend Feed Mode</label>
+            <label className="nb-fg-label">Live Feed Status</label>
             <div className="nb-checkbox-list">
               <label className="nb-checkbox-item">
                 <input type="checkbox" defaultChecked />
-                <span>Live REST Stream</span>
+                <span>Finnhub Live Quotes</span>
               </label>
               <label className="nb-checkbox-item">
                 <input type="checkbox" defaultChecked />
-                <span>Fundamental Ratios</span>
-              </label>
-              <label className="nb-checkbox-item">
-                <input type="checkbox" />
-                <span>Analyst Consensus</span>
+                <span>Tavily AI Intelligence</span>
               </label>
               <label className="nb-checkbox-item">
                 <input type="checkbox" defaultChecked />
-                <span>Risk Scored (Beta)</span>
+                <span>Analyst Ratings</span>
               </label>
             </div>
           </div>
         </aside>
 
-        {/* RIGHT COLUMN: METRICS, CHARTS, AND PERFORMANCE REPORT */}
+        {/* RIGHT COLUMN: DEFAULT IPO DIRECTORY vs SPECIFIC EVALUATED COMPANY */}
         <section className="nb-main-content">
           {loading ? (
             <div className="nb-empty-box">
               <div className="nb-spinner-nb"></div>
-              <p>Fetching company intelligence & performance metrics...</p>
+              <p>Aggregating Finnhub data & Tavily AI intelligence...</p>
+            </div>
+          ) : !selectedCompany ? (
+            /* ── DEFAULT VIEW: IPOs & LISTED COMPANIES DIRECTORY WITH PAGINATION ── */
+            <div className="nb-ipos-container">
+              {displayedIpos.map((item) => (
+                <div key={item.symbol} className="nb-ipo-item-card">
+                  <div className="nb-ipo-left">
+                    <div
+                      className="nb-ipo-avatar"
+                      style={{ background: item.color || '#18181B' }}
+                    >
+                      {item.initials || item.symbol.slice(0, 2)}
+                    </div>
+                    <div className="nb-ipo-details">
+                      <div className="nb-ipo-name-row">
+                        <span className="nb-ipo-name">{item.name}</span>
+                        <span className="nb-tag-pill green">
+                          {item.ipoDate ? `IPO: ${item.ipoDate}` : 'Listed'}
+                        </span>
+                        <span className="nb-tag-pill blue">
+                          {item.symbol}
+                        </span>
+                      </div>
+                      <span className="nb-ipo-sub">
+                        {item.sector} · IPO Issue: {item.ipoPrice || '—'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="nb-ipo-center-stats">
+                    <div className="nb-stat-pill-col">
+                      <span className="nb-spc-label">Stock Price</span>
+                      <span className="nb-spc-val">${item.price || item.defaultPrice}</span>
+                    </div>
+                    <div className="nb-stat-pill-col">
+                      <span className="nb-spc-label">24h Change</span>
+                      <span className={`nb-spc-val ${item.isUp !== false ? 'up' : 'dn'}`}>
+                        {item.change || '+1.20%'}
+                      </span>
+                    </div>
+                    <div className="nb-stat-pill-col">
+                      <span className="nb-spc-label">Market Cap</span>
+                      <span className="nb-spc-val">{item.marketCap || '$10.0B'}</span>
+                    </div>
+                  </div>
+
+                  <div className="nb-ipo-right-action">
+                    <button
+                      className="nb-action-btn"
+                      onClick={() => handleSelectCompany(item.symbol)}
+                    >
+                      Evaluate Intel ↗
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* ── PAGINATION BAR ── */}
+              <div className="nb-pagination-bar">
+                <span className="nb-page-info">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} -{' '}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, ipoList.length)} of {ipoList.length} companies
+                </span>
+
+                <div className="nb-page-buttons">
+                  <button
+                    className="nb-page-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    ← Prev
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+                    <button
+                      key={num}
+                      className={`nb-page-btn ${currentPage === num ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(num)}
+                    >
+                      {num}
+                    </button>
+                  ))}
+
+                  <button
+                    className="nb-page-btn"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
+            /* ── SPECIFIC EVALUATED COMPANY VIEW (WHEN SEARCHED OR CLICKED) ── */
             <>
-              {/* ── 4 STAT CARDS (IMAGE 1 STYLE) ── */}
+              {/* Top 4 Stat Cards */}
               <div className="nb-stats-grid">
                 <div className="nb-stat-card yellow-accent">
                   <div className="nb-stat-top">
                     <div className="nb-stat-icon-box">$</div>
-                    <div className="nb-stat-badge">↗ 12.5%</div>
+                    <div className="nb-stat-badge">{selectedCompany.change}</div>
                   </div>
                   <div>
-                    <span className="nb-stat-label">TOTAL VALUATION</span>
+                    <span className="nb-stat-label">LIVE STOCK PRICE</span>
                     <div className="nb-stat-val">
-                      {selectedCompany ? selectedCompany.currency + selectedCompany.price : '$42,500'}
+                      {selectedCompany.currency || '$'}{selectedCompany.price}
                     </div>
                   </div>
                 </div>
@@ -352,7 +498,7 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
                 <div className="nb-stat-card">
                   <div className="nb-stat-top">
                     <div className="nb-stat-icon-box">PE</div>
-                    <div className="nb-stat-badge">↗ 8.2%</div>
+                    <div className="nb-stat-badge">TTM</div>
                   </div>
                   <div>
                     <span className="nb-stat-label">P/E RATIO</span>
@@ -365,12 +511,12 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
                 <div className="nb-stat-card">
                   <div className="nb-stat-top">
                     <div className="nb-stat-icon-box">%</div>
-                    <div className="nb-stat-badge">42.3%</div>
+                    <div className="nb-stat-badge">ROE</div>
                   </div>
                   <div>
                     <span className="nb-stat-label">RETURN ON EQUITY</span>
                     <div className="nb-stat-val">
-                      {selectedCompany?.metrics?.roe || '147.2%'}
+                      {selectedCompany?.metrics?.roe || '42.3%'}
                     </div>
                   </div>
                 </div>
@@ -389,13 +535,13 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
                 </div>
               </div>
 
-              {/* ── 2 CHARTS ROW (IMAGE 1 STYLE) ── */}
+              {/* Charts Row */}
               <div className="nb-charts-row">
                 <div className="nb-chart-card">
                   <div className="nb-chart-header">
                     <div>
-                      <span className="nb-chart-title">PRICE / REVENUE OVERVIEW</span>
-                      <span className="nb-chart-sub">Monthly Trajectory · 30-Day Step Trajectory</span>
+                      <span className="nb-chart-title">PRICE / TRAJECTORY OVERVIEW</span>
+                      <span className="nb-chart-sub">30-Day Step Trajectory · {selectedCompany?.symbol}</span>
                     </div>
                     <button className="nb-pill-btn">••• OPTIONS</button>
                   </div>
@@ -406,7 +552,7 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
                   <div className="nb-chart-header">
                     <div>
                       <span className="nb-chart-title">VOLUME ACTIVITY</span>
-                      <span className="nb-chart-sub">Weekly Frequency</span>
+                      <span className="nb-chart-sub">Weekly Market Momentum</span>
                     </div>
                     <button className="nb-pill-btn">WEEKLY</button>
                   </div>
@@ -443,122 +589,182 @@ export default function Dashboard({ onBackToHome, initialSymbol = 'AAPL' }) {
                 </div>
               </div>
 
-              {/* ── PERFORMANCE REPORT DUMMY CARDS ── */}
-              <div className="nb-company-card">
-                <div className="nb-cc-header">
-                  <div className="nb-cc-left">
-                    <div
-                      className="nb-cc-logo-box"
-                      style={{ background: currentMeta.color || '#18181B' }}
-                    >
-                      {currentMeta.initials || 'CO'}
-                    </div>
-                    <div className="nb-cc-title-wrap">
-                      <div className="nb-cc-title-row">
-                        <span className="nb-cc-title">{selectedCompany?.name || 'Apple Inc.'}</span>
-                        <span className="nb-tag-pill green">Full-time Live</span>
-                        <span className="nb-tag-pill coral">{selectedCompany?.metrics?.analystRating || 'Strong Buy'}</span>
+              {/* Dynamic Section (Fundamentals / Risk / News / History) */}
+              {activeTab === 'fundamentals' && (
+                <div className="nb-company-card">
+                  <div className="nb-cc-header">
+                    <div className="nb-cc-left">
+                      <div
+                        className="nb-cc-logo-box"
+                        style={{ background: currentMeta.color || '#18181B' }}
+                      >
+                        {currentMeta.initials || selectedCompany.symbol.slice(0, 2)}
                       </div>
-                      <span className="nb-cc-sub">
-                        {selectedCompany?.symbol || 'AAPL'} · {selectedCompany?.sector || 'Consumer Electronics'}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="nb-cc-right">
-                    <PinIcon />
-                    <span>Global Exchange</span>
-                  </div>
-                </div>
-
-                <div className="nb-cc-body">
-                  <ul className="nb-cc-bullets">
-                    <li>
-                      <strong>Revenue Expansion:</strong> {selectedCompany?.metrics?.revGrowth || '+8.2% YoY'} consistent annual expansion with net profit margin of {selectedCompany?.metrics?.netMargin || '26.4%'}.
-                    </li>
-                    <li>
-                      <strong>Cash Flow Reserves:</strong> Generating {selectedCompany?.metrics?.freeCashFlow || '$108B'} in unlevered free cash flow with prudent debt ratio of {selectedCompany?.metrics?.debtToEquity || '1.45'}.
-                    </li>
-                    <li>
-                      <strong>Executive Summary:</strong> {selectedCompany?.summary || 'Consistent revenue expansion propelled by high-margin Services, recurring ecosystem subscriptions, and AI integration.'}
-                    </li>
-                  </ul>
-                  <button className="nb-action-btn">
-                    Export Report
-                  </button>
-                </div>
-              </div>
-
-              <div className="nb-company-card">
-                <div className="nb-cc-header">
-                  <div className="nb-cc-left">
-                    <div className="nb-cc-logo-box" style={{ background: '#0078D4' }}>
-                      MS
-                    </div>
-                    <div className="nb-cc-title-wrap">
-                      <div className="nb-cc-title-row">
-                        <span className="nb-cc-title">Cloud & AI Division Health</span>
-                        <span className="nb-tag-pill blue">Enterprise</span>
-                        <span className="nb-tag-pill green">Low Risk</span>
+                      <div className="nb-cc-title-wrap">
+                        <div className="nb-cc-title-row">
+                          <span className="nb-cc-title">{selectedCompany.name}</span>
+                          <span className="nb-tag-pill green">Live Feed</span>
+                          <span className="nb-tag-pill coral">{selectedCompany?.metrics?.analystRating || 'Strong Buy'}</span>
+                        </div>
+                        <span className="nb-cc-sub">
+                          {selectedCompany.symbol} · {selectedCompany.sector} · Market Cap {selectedCompany.marketCap}
+                        </span>
                       </div>
-                      <span className="nb-cc-sub">Microsoft Copilot & Azure Cloud Metrics</span>
+                    </div>
+                    <div className="nb-cc-right">
+                      <PinIcon />
+                      <span>{selectedCompany?.exchange || 'NASDAQ / Global'}</span>
                     </div>
                   </div>
-                  <div className="nb-cc-right">
-                    <PinIcon />
-                    <span>Redmond, WA, USA</span>
+
+                  <div className="nb-cc-body">
+                    <ul className="nb-cc-bullets">
+                      <li>
+                        <strong>Revenue Expansion:</strong> {selectedCompany?.metrics?.revGrowth || '+12.5% YoY'} with net profit margin of {selectedCompany?.metrics?.netMargin || '26.4%'}.
+                      </li>
+                      <li>
+                        <strong>Valuation Multiples:</strong> P/E Ratio {selectedCompany?.metrics?.peRatio || '33.8'} with Beta {selectedCompany?.metrics?.beta || '1.18'} and 52-Week Range {selectedCompany?.metrics?.week52Low || '$164.08'} - {selectedCompany?.metrics?.week52High || '$237.23'}.
+                      </li>
+                      <li>
+                        <strong>AI Summary (Tavily):</strong> {selectedCompany?.summary || 'Consistent revenue expansion propelled by high-margin Services, recurring ecosystem subscriptions, and AI integration.'}
+                      </li>
+                    </ul>
+                    <button className="nb-action-btn">
+                      Export Report
+                    </button>
                   </div>
                 </div>
+              )}
 
-                <div className="nb-cc-body">
-                  <ul className="nb-cc-bullets">
-                    <li>
-                      <strong>Quarterly Cloud Growth:</strong> Over +29% YoY expansion in enterprise infrastructure demand.
-                    </li>
-                    <li>
-                      <strong>Operating Efficiency:</strong> 36.1% net profit margin driven by scalable recurring enterprise software seats.
-                    </li>
-                  </ul>
-                  <button className="nb-action-btn">
-                    Apply Intel
-                  </button>
-                </div>
-              </div>
-
-              <div className="nb-company-card">
-                <div className="nb-cc-header">
-                  <div className="nb-cc-left">
-                    <div className="nb-cc-logo-box" style={{ background: '#76B900' }}>
-                      NV
-                    </div>
-                    <div className="nb-cc-title-wrap">
-                      <div className="nb-cc-title-row">
-                        <span className="nb-cc-title">Semiconductor & Accelerator Demand</span>
-                        <span className="nb-tag-pill coral">High Volatility</span>
-                        <span className="nb-tag-pill green">Triple Digit Growth</span>
+              {activeTab === 'risk' && (
+                <div className="nb-company-card">
+                  <div className="nb-cc-header">
+                    <div className="nb-cc-left">
+                      <div className="nb-cc-logo-box" style={{ background: '#CC0000' }}>
+                        RK
                       </div>
-                      <span className="nb-cc-sub">Data Center GPU Allocations</span>
+                      <div className="nb-cc-title-wrap">
+                        <div className="nb-cc-title-row">
+                          <span className="nb-cc-title">Tavily AI Risk Analysis</span>
+                          <span className="nb-tag-pill coral">Beta {selectedCompany?.metrics?.beta || '1.18'}</span>
+                          <span className="nb-tag-pill green">Monitored</span>
+                        </div>
+                        <span className="nb-cc-sub">Real-Time Risk & Volatility Indicators for {selectedCompany.name}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="nb-cc-right">
-                    <PinIcon />
-                    <span>Santa Clara, CA, USA</span>
+
+                  <div className="nb-cc-body" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+                      {(selectedCompany?.risks || ['Macro Volatility', 'Supply Chain', 'Regulatory Oversight', 'Market Competition']).map((r, i) => (
+                        <span key={i} className="nb-tag-pill blue" style={{ color: '#18181B', background: '#F4D35E' }}>
+                          ⚠ {r}
+                        </span>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: 13, lineHeight: 1.7, color: '#18181B' }}>
+                      <strong>Risk Assessment:</strong> Beta rating of <strong>{selectedCompany?.metrics?.beta || '1.18'}</strong> indicates moderate market sensitivity. Key areas to monitor include quarterly supply chain throughput, foreign exchange fluctuations, and regulatory compliance across global jurisdictions.
+                    </p>
                   </div>
                 </div>
+              )}
 
-                <div className="nb-cc-body">
-                  <ul className="nb-cc-bullets">
-                    <li>
-                      <strong>Triple Digit Surge:</strong> +122% YoY revenue growth driven by Blackwell and H100 computing architectures.
-                    </li>
-                    <li>
-                      <strong>Margin Expansion:</strong> Gross margins reaching 55.3% with top-tier ROE exceeding 115%.
-                    </li>
-                  </ul>
-                  <button className="nb-action-btn">
-                    Apply Intel
-                  </button>
+              {activeTab === 'news' && (
+                <div className="nb-company-card">
+                  <div className="nb-cc-header">
+                    <div className="nb-cc-left">
+                      <div className="nb-cc-logo-box" style={{ background: '#0078D4' }}>
+                        NW
+                      </div>
+                      <div className="nb-cc-title-wrap">
+                        <div className="nb-cc-title-row">
+                          <span className="nb-cc-title">Live News & Event Headlines</span>
+                          <span className="nb-tag-pill green">Finnhub Real-time</span>
+                        </div>
+                        <span className="nb-cc-sub">Latest market filings and analyst coverage</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="nb-cc-body" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {(selectedCompany?.news || []).map((n, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            padding: '10px 14px',
+                            border: '1.5px solid #18181B',
+                            borderRadius: 6,
+                            background: '#F9F7F2',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <div>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: '#18181B', display: 'block' }}>
+                              {n.headline || n.title}
+                            </span>
+                            <span style={{ fontSize: 11, color: '#71717A' }}>
+                              {n.source} · {n.datetime || 'Today'}
+                            </span>
+                          </div>
+                          {n.url && (
+                            <a
+                              href={n.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              style={{
+                                fontSize: 12,
+                                fontWeight: 700,
+                                color: '#EE6352',
+                                textDecoration: 'none',
+                                marginLeft: 16,
+                                flexShrink: 0,
+                              }}
+                            >
+                              Read ↗
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {activeTab === 'history' && (
+                <div className="nb-company-card">
+                  <div className="nb-cc-header">
+                    <div className="nb-cc-left">
+                      <div className="nb-cc-logo-box" style={{ background: '#2EC4B6' }}>
+                        52
+                      </div>
+                      <div className="nb-cc-title-wrap">
+                        <div className="nb-cc-title-row">
+                          <span className="nb-cc-title">Historical Extremes & Range</span>
+                          <span className="nb-tag-pill green">52-Week</span>
+                        </div>
+                        <span className="nb-cc-sub">Trading ranges and valuation support levels</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="nb-cc-body">
+                    <ul className="nb-cc-bullets">
+                      <li>
+                        <strong>52-Week High:</strong> {selectedCompany?.metrics?.week52High || '$237.23'} — Peak momentum valuation.
+                      </li>
+                      <li>
+                        <strong>52-Week Low:</strong> {selectedCompany?.metrics?.week52Low || '$164.08'} — Major accumulation floor.
+                      </li>
+                      <li>
+                        <strong>Current Position:</strong> Currently trading at {selectedCompany?.currency || '$'}{selectedCompany?.price} ({selectedCompany?.change} on the session).
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </section>
