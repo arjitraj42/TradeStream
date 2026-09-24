@@ -739,8 +739,8 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
       <header className="nb-navbar">
         <div className="nb-nav-left">
           <div className="nb-logo" onClick={onBackToHome}>
-            <span className="nb-logo-badge">IA</span>
-            <span>Invest Agent</span>
+            <span className="nb-logo-badge">TX</span>
+            <span>TradeX</span>
           </div>
           <button className="nb-back-btn" onClick={onBackToHome}>
             ← Back to Home
@@ -755,28 +755,17 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
             Startups & Listed IPOs
           </span>
           <span
-            className={`nb-nav-link ${viewMode === 'intel' ? 'active' : ''}`}
-            onClick={() => {
-              setViewMode('intel');
-              if (!selectedCompany) {
-                handleSelectCompany('NVDA');
-              }
-            }}
+            className={`nb-nav-link ${viewMode === 'market-pulse' ? 'active' : ''}`}
+            onClick={() => setViewMode('market-pulse')}
           >
-            Company Intel
-          </span>
-          <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('mini'); }}>
-            Mini Startups ({miniCount})
-          </span>
-          <span className="nb-nav-link" onClick={() => { handleResetToDirectory(); setMarketTypeFilter('unicorns'); }}>
-            Unicorns ({unicornCount})
+            Live News Feed
           </span>
           <span
             className="nb-nav-link"
             style={{ color: '#10B981', fontStyle: 'normal' }}
             onClick={onOpenEngineSimulator}
           >
-            ⚡ Engine Simulator
+            Engine Simulator
           </span>
         </nav>
 
@@ -786,9 +775,9 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
             onClick={() => openTradeModal('NVDA', 128.45, 'NVIDIA Corp')}
             title="Instant Order Execution"
           >
-            ⚡ Quick Trade
+            Quick Trade
           </button>
-          <div className="nb-avatar-pill">IA</div>
+          <div className="nb-avatar-pill">TX</div>
         </div>
       </header>
 
@@ -950,7 +939,7 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
         </div>
 
         {selectedCompany ? (
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="nb-status-actions">
             <button className="nb-view-all-btn" onClick={handleResetToDirectory}>
               ← View All Startups & IPOs
             </button>
@@ -959,11 +948,11 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
               style={{ background: '#2EC4B6', color: '#18181B' }}
               onClick={() => handleTradeClick(selectedCompany)}
             >
-              Open Trade Console ({selectedCompany.symbol}) ⚡
+              Open Trade Console ({selectedCompany.symbol})
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div className="nb-status-actions">
             {(marketTypeFilter !== 'all' || sectorFilter !== 'all' || stageFilter !== 'all' || query || marketRegionSearch) && (
               <button className="nb-view-all-btn" onClick={handleClearAllFilters}>
                 Reset Filters ✕
@@ -974,7 +963,7 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
               style={{ background: '#10B981', color: '#FFFFFF' }}
               onClick={onOpenEngineSimulator}
             >
-              ⚡ Open Matching Engine Simulator
+              Open Matching Engine Simulator
             </button>
           </div>
         )}
@@ -1236,7 +1225,7 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
                         style={{ background: '#2EC4B6', color: '#18181B' }}
                         onClick={() => handleTradeClick(item)}
                       >
-                        Trade ⚡
+                        Trade
                       </button>
                       <button
                         className="nb-action-btn"

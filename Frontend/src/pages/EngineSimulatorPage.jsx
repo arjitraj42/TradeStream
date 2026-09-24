@@ -299,7 +299,7 @@ export default function EngineSimulatorPage({ onBack }) {
               className={`es-ai-btn ${aiActive.autoLoop ? 'auto-on' : ''}`}
               onClick={() => setAiActive((prev) => ({ ...prev, autoLoop: !prev.autoLoop }))}
             >
-              ⚡ Continuous Simulation {aiActive.autoLoop ? 'ON' : 'OFF'}
+              🔄 Continuous Simulation {aiActive.autoLoop ? 'ON' : 'OFF'}
             </button>
           </div>
         </div>

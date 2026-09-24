@@ -1,8 +1,40 @@
-# ⚡ TradeStream Platform & Matching Engine Simulator
+# TradeStream — High-Frequency Limit Order Book & Matching Engine Simulator
 
-A production-ready, high-performance **Stock Market Intelligence, Trading Platform & Order Matching Engine Simulator** built with **React, Vite, Node.js, Express, PostgreSQL, Prisma ORM, Socket.IO, and Neo-Brutalist UI Styling**.
+A production-ready **Stock Market Intelligence, Trading Platform & Order Matching Engine Simulator** built with React, Vite, Node.js, Express, PostgreSQL, Prisma ORM, Socket.IO, and a Neo-Brutalist UI.
 
 ---
+
+## 🎯 Problem Statement
+
+> **Real stock exchanges process millions of orders per second using complex price-time priority algorithms — yet no accessible, open simulator lets students, engineers, or researchers observe, interact with, and learn from this mechanics in real time.**
+
+TradeStream solves this by building an end-to-end, fully operational matching engine and market intelligence platform — giving you a transparent, instrumented window into how modern financial markets work, from order ingestion to trade execution, live news sentiment to company intelligence.
+
+---
+
+## ⚡ Features & Problem Alignment — At a Glance
+
+| Feature | What It Does | Problem It Solves |
+|---|---|---|
+| **Price-Time Priority Matching Engine** | Executes BUY/SELL Limit & Market orders in microseconds using strict FIFO queue ordering | Simulates real exchange matching logic — invisible in production systems |
+| **Live Order Book & Depth Visualizer** | Shows real-time top-10 bid/ask levels with depth bars, mid-price & spread | Makes the order book — the heartbeat of every exchange — visually transparent |
+| **Partial Fill Execution** | Fills orders against available liquidity; residual quantity stays in the book | Mirrors real exchange behavior where large orders rarely fill completely in one shot |
+| **Microsecond Latency Tracker** | Measures matching execution time via `performance.now()` — displayed live on-screen | Reveals the performance cost of different order types and book depths |
+| **5 Autonomous AI Trader Bots** | Bull, Bear, Aggressive, Value, and MarketMaker bots inject continuous orders | Simulates real market participants creating organic price discovery without manual input |
+| **Engine Simulator Dashboard** | Tracks Orders Processed, Trades Executed, Throughput (orders/sec), Avg Latency, Best Bid/Ask | Provides a real-time KPI panel identical to what an exchange monitoring team would watch |
+| **Per-Company Trading Console** | Dedicated order form for any ticker (NVDA, TSLA, MSFT, RELIANCE) with ₹/$ toggle | Bridges simulated exchange mechanics with recognizable real-world assets |
+| **Market Intelligence Dashboard** | IPO Directory with Finnhub live quotes, Tavily AI company summaries, growth charts | Addresses the gap between raw price data and actionable market context |
+| **Market Pulse — Live News Feed** | Real-time news stream filtered by company, sentiment (Bullish/Neutral/Bearish) & topic | Connects news sentiment to price movement — the qualitative side of trading decisions |
+| **Dual-Currency Support (₹ / $)** | Seamlessly toggles between INR and USD with accurate market-cap and pricing context | Makes the platform relevant to both Indian startup investors and global markets |
+| **Trending Topics & Sentiment Index** | Aggregates keyword momentum and a 0–100 market greed/fear index from live data | Replicates the sentiment analytics layer used by institutional quant desks |
+| **Company Growth Heatmap** | Color-coded heatmap showing 24H % change across all tracked companies | Gives a portfolio-wide view of capital rotation at a glance |
+| **Live Ticker Tape** | Persistent sticky bar showing live price + change for all tracked symbols | Replicates the real-time feed seen on Bloomberg, CNBC, and NSE terminals |
+| **Backend REST API + Socket.IO** | `/api/orders`, `/api/ipos`, `/api/company/:symbol`, `/api/news`, `/api/market-pulse` | Enables programmatic access — the same way algorithmic traders consume exchange data feeds |
+| **Prisma ORM + PostgreSQL Persistence** | Stores all orders, trades, and market context in a relational database | Gives the simulation real persistence — orders survive page refreshes like on a real exchange |
+| **Node-Cron Scheduler (7s ticks)** | Automatically drives market tick cycles, bot activity, and price updates | Replicates real exchange session clocks and market event scheduling |
+
+---
+
 
 ## 🏛️ System Architecture
 
