@@ -1,70 +1,137 @@
-.navbar {
+.ts-navbar {
   position: sticky;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  background: var(--bg-nav);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-subtle);
-  padding: 16px 40px;
+  background: #F7F4EE;
+  border-bottom: 3px solid #18181B;
+  padding: 14px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.navbar-brand {
+.ts-navbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: -0.5px;
+  gap: 10px;
   cursor: pointer;
   user-select: none;
 }
 
-.brand-dot {
-  width: 12px;
-  height: 12px;
-  background-color: var(--color-primary);
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 0 10px rgba(0, 71, 255, 0.6);
-}
-
-.navbar-menu {
+.ts-brand-icon {
+  width: 32px;
+  height: 32px;
+  background: #F4D35E;
+  border: 2.5px solid #18181B;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #18181B;
   display: flex;
   align-items: center;
-  gap: 32px;
-  list-style: none;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 16px;
+  color: #18181B;
 }
 
-.navbar-link {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: color var(--transition-fast);
+.ts-brand-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #18181B;
+  letter-spacing: -0.8px;
+  text-transform: uppercase;
+}
+
+.ts-brand-badge {
+  font-size: 11px;
+  font-weight: 800;
+  color: #18181B;
+  background: #2EC4B6;
+  border: 2px solid #18181B;
+  box-shadow: 2px 2px 0 #18181B;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.ts-nav-center {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.ts-nav-item {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #18181B;
   cursor: pointer;
+  padding: 6px 12px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-.navbar-link:hover {
-  color: var(--text-primary);
+.ts-nav-item:hover {
+  background: #FFFFFF;
+  border-color: #18181B;
+  box-shadow: 3px 3px 0 #18181B;
+  transform: translate(-1px, -1px);
 }
 
-.navbar-actions {
+.ts-nav-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    padding: 14px 20px;
-  }
-  .navbar-menu {
+.ts-nav-btn {
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 800;
+  border-radius: 6px;
+  border: 2.5px solid #18181B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.ts-nav-btn.secondary {
+  background: #FFFFFF;
+  color: #18181B;
+  box-shadow: 3px 3px 0 #18181B;
+}
+
+.ts-nav-btn.secondary:hover {
+  background: #F4D35E;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #18181B;
+}
+
+.ts-nav-btn.primary {
+  background: #EE6352;
+  color: #FFFFFF;
+  box-shadow: 3px 3px 0 #18181B;
+}
+
+.ts-nav-btn.primary:hover {
+  background: #D84A39;
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 #18181B;
+}
+
+.ts-btn-arrow {
+  font-size: 14px;
+}
+
+@media (max-width: 860px) {
+  .ts-nav-center {
     display: none;
   }
 }
