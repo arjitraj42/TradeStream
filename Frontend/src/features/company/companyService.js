@@ -1,3 +1,5 @@
+import { API_BASE_URL } from '../../services/apiConfig';
+
 // Company Service: Handles real-time market data fetching and financial growth evaluation via Backend (Finnhub + Tavily)
 
 export const POPULAR_COMPANIES = [
@@ -29,7 +31,7 @@ export const POPULAR_COMPANIES = [
 
 export async function fetchListedIPOs(market = 'all') {
   try {
-    const url = market && market !== 'all' ? `/api/ipos?market=${market}` : '/api/ipos';
+    const url = market && market !== 'all' ? `${API_BASE_URL}/ipos?market=${market}` : `${API_BASE_URL}/ipos`;
     const response = await fetch(url, {
       headers: { 'Accept': 'application/json' },
     });
@@ -49,7 +51,7 @@ export async function fetchCompanyGrowthData(symbol = 'AAPL') {
   const cleanSymbol = symbol.toUpperCase().split('.')[0];
 
   try {
-    const response = await fetch(`/api/company/${symbol}`, {
+    const response = await fetch(`${API_BASE_URL}/company/${symbol}`, {
       headers: { 'Accept': 'application/json' },
     });
 
@@ -117,7 +119,7 @@ export async function fetchCompanyGrowthData(symbol = 'AAPL') {
 
 export async function fetchMarketPulseData() {
   try {
-    const res = await fetch('/api/market-pulse', {
+    const res = await fetch(`${API_BASE_URL}/market-pulse`, {
       headers: { 'Accept': 'application/json' },
     });
     if (res.ok) {
