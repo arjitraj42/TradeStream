@@ -342,14 +342,24 @@ export default function Dashboard({ onBackToHome, onOpenTradePage, onOpenEngineS
             Company Intel
           </span>
           <span
+            className={`nb-nav-link ${viewMode === 'market-pulse' ? 'active' : ''}`}
+            onClick={() => setViewMode('market-pulse')}
+          >
+            Market Pulse
+          </span>
+          <span
             className="nb-nav-link"
             style={{ color: '#10B981', fontStyle: 'normal' }}
             onClick={onOpenEngineSimulator}
           >
             ⚡ Engine Simulator
           </span>
-          <span className="nb-nav-link">Market Screener</span>
-          <span className="nb-nav-link">API Docs</span>
+          <span
+            className={`nb-nav-link ${viewMode === 'api-docs' ? 'active' : ''}`}
+            onClick={() => setViewMode('api-docs')}
+          >
+            API Docs
+          </span>
         </nav>
 
         <div className="nb-nav-right">
