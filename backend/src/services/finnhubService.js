@@ -146,4 +146,27 @@ export const finnhubService = {
       return { rating: 'Strong Buy (88% Consensus)' };
     }
   },
+
+  async getGeneralNews() {
+    try {
+      const res = await axios.get(`${FINNHUB_BASE}/news`, {
+        params: { category: 'general', token: FINNHUB_KEY },
+        timeout: 6000,
+      });
+      if (Array.isArray(res.data)) {
+        return res.data.slice(0, 15).map((item) => ({
+          id: item.id,
+          headline: item.headline,
+          summary: item.summary,
+          source: item.source,
+          url: item.url,
+          datetime: item.datetime ? new Date(item.datetime * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent',
+        }));
+      }
+      return [];
+    } catch (err) {
+      console.warn('Finnhub general news error:', err.message);
+      return [];
+    }
+  },
 };
